@@ -23,7 +23,7 @@ class NumberOfProducts extends LivewireDatatable
     protected $listeners = ['refreshSavingsComponent' => '$refresh'];
     public $exportable = true;
 
-    
+
 
 
     public function builder()

@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://96.46.181.165/microfinance/MFI/maisha_finance_limited/public'),
+    'url' => env('APP_URL', 'https://maishafastcredit.co.tz'),
 
     'asset_url' => env('ASSET_URL'),
 

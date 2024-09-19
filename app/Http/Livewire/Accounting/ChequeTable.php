@@ -3,11 +3,11 @@
 namespace App\Http\Livewire\Accounting;
 
 use App\Http\Livewire\Branches\Branches;
+use App\Models\AccountsModel;
 use App\Models\BranchesModel;
 use App\Models\ChequeModel;
 use App\Models\Employee;
-use App\Models\LoansModel;
-use App\Models\Members;
+use App\Models\ClientsModel;
 use App\Models\MembersModel;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -22,14 +22,13 @@ class ChequeTable extends LivewireDatatable
 
 
 
-
-    public function builder()
+    public function builder(): \Illuminate\Database\Eloquent\Builder
     {
 
 
 
 
-        return ChequeModel::query(); // You can modify the ordering as per your requirement
+            return ChequeModel::query(); // You can modify the ordering as per your requirement
 
     }
 
@@ -38,30 +37,27 @@ class ChequeTable extends LivewireDatatable
     {
         return [
 
-            Column::callback('customer_account',function($account_number){
-                $client_number=LoansModel::where('loan_account_number',$account_number)->value('client_number');
+            Column::callback(['customer_account'],function ($memberNumber){
+               $memberNumber=AccountsModel::where('account_number',$memberNumber)->value('client_number');
+                if($memberNumber){
+                    return ClientsModel::where('client_number',$memberNumber)->value('first_name').' '.ClientsModel::where('client_number',$memberNumber)->value('middle_name').' '.ClientsModel::where('client_number',$memberNumber)->value('last_name')."($memberNumber)";
+                }else{
+                    return null;
+                }
 
-                $clients=DB::table('clients')->where('client_number',$client_number)->first();
-                return $clients->first_name.' '.$clients->middle_name.' '.$clients->last_name;
-            })->label('client Name'),
+            })->label('full name')->searchable(),
             Column::name('customer_account')->label('account number'),
             Column::callback('branch',function($branch_id){
                 return BranchesModel::where('id',$branch_id)->value('name').'('.BranchesModel::where('id',$branch_id)->value('region').','.BranchesModel::where('id',$branch_id)->value('wilaya').')';
             })->label('branch'),
-            Column::callback('amount',function ($amount){
-                return number_format($amount,2);
-            })->label('amount (TZS)')->searchable(),
-            Column::name('created_at')->label('issued date')->searchable(),
-            Column::callback('finance_approver',function ($employeeId){
-                $employee=Employee::where('id',$employeeId)->first();
-                return $employee->first_name.' '.$employee->middle_name.' '.$employee->last_name;
-            })->label('initiator'),
-            Column::name('is_cleared')->label('cleared'),
-            Column::name('status')->label('status')->searchable(),
+            Column::name('amount')->label('amount'),
+            Column::name('status')->label('status'),
+            Column::callback('id',function($id){
+                return view('livewire.profile-setting.table-action',['id'=>$id]);
+            })->label('action'),
 
 
-
-        ];
+             ];
     }
 
 

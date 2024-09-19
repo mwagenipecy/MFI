@@ -2,22 +2,16 @@
 namespace App\Http\Livewire\Accounting;
 use App\Models\AccountsModel;
 use App\Models\approvals;
-use App\Models\Employee;
 use App\Models\general_ledger;
 use App\Models\Loan_sub_products;
 use App\Models\loans_schedules;
 use App\Models\loans_summary;
 use App\Models\LoansModel;
-use App\Models\MembersModel;
-use App\Mail\LoanProgress;
+use App\Models\ClientsModel;
 use Carbon\Carbon;
-use DateInterval;
-use DateTime;
-use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Mediconesystems\LivewireDatatables\Column;
@@ -28,18 +22,18 @@ class LoansTable extends LivewireDatatable
 {
 
     public $photo;
+    public $exportable=true;
 
     public $collateral_type;
     public $collateral_description;
     public $daily_sales;
     public $loan;
+    public $products;
     public $collateral_value;
     public $loan_sub_product;
-    public $tenure = 12;
+    public $tenure = '12';
     public $principle;
     public $member;
-
-
     public $guarantor;
     public $disbursement_account;
     public $collection_account_loan_interest;
@@ -48,7 +42,6 @@ class LoansTable extends LivewireDatatable
     public $collection_account_loan_penalties;
     public $principle_min_value;
     public $principle_max_value;
-    public $interest_method;
     public $min_term;
     public $max_term;
     public $interest_value;
@@ -57,11 +50,10 @@ class LoansTable extends LivewireDatatable
     public $amortization_method;
     public $days_in_a_month;
     public $loan_id;
+    public $status;
     public $loan_account_number;
 
     public $member_number;
-
-
     public $interest;
     public $business_licence_number;
     public $business_tin_number;
@@ -80,13 +72,8 @@ class LoansTable extends LivewireDatatable
     public $recommended_installment;
     public $recommended = true;
     public $business_age;
-    public $bank1;
+    public $bank1="921673621";
     public  $available_funds;
-    public $repaymentPlan;
-
-    protected $listeners=[
-      'approvalAndDisburse'=>'approveAndDisburse'
-    ];
 
 
 
@@ -117,14 +104,14 @@ class LoansTable extends LivewireDatatable
     {
         return [
 
-            Column::callback(['member_number'], function ($member_number) {
+            Column::callback(['client_number'], function ($member_number) {
 
-                return MembersModel::where('member_number',$member_number)->value('first_name').' '.MembersModel::where('member_number',$member_number)->value('middle_name').' '.MembersModel::where('member_number',$member_number)->value('last_name');
+                return ClientsModel::where('client_number',$member_number)->value('first_name').' '.ClientsModel::where('client_number',$member_number)->value('middle_name').' '.ClientsModel::where('client_number',$member_number)->value('last_name');
             })->label('Member name'),
 
             Column::callback(['guarantor'], function ($guarantor) {
 
-                return MembersModel::where('member_number',$guarantor)->value('first_name').' '.MembersModel::where('member_number',$guarantor)->value('middle_name').' '.MembersModel::where('member_number',$guarantor)->value('last_name');
+                return ClientsModel::where('client_number',$guarantor)->value('first_name').' '.ClientsModel::where('client_number',$guarantor)->value('middle_name').' '.ClientsModel::where('client_number',$guarantor)->value('last_name');
             })->label('Guarantor'),
             Column::name('loan_id')
                 ->label('loan id'),
@@ -145,7 +132,7 @@ class LoansTable extends LivewireDatatable
 
             Column::name('status')
                 ->label('Status'),
-            Column::callback(['ID'], function ($id) {
+            Column::callback(['id'], function ($id) {
                 return view('livewire.approvals.action', ['id' => $id, 'move' => false]);
             })->unsortable()->label('Decision'),
 
@@ -170,326 +157,54 @@ class LoansTable extends LivewireDatatable
     }
 
 
-    function approve($id)
-    {
-      // if(LoansModel::where('id',$id)->value('has_partner') =="YES"){
 
-            $this->emit('selectPartner',$id);
-       // }else{
-
-      //    $this->approveAndDisburse($id);
-     // }
-    }
-
-
-
-    public function transactionTOPartner( $loan_id)
-    {
-        // debit client account
-         $loan = DB::table('loans')->where('id',$loan_id)->first();
-        $account=DB::table('accounts')->where('id',session()->get('partner_account_id'))->first();
-
-        if($loan && $account){
-             //client information
-             $client_account_number=$loan->loan_account_number;
-             $loan_amount=$loan->principle;
-
-
-             // partner information
-             $partner_account_number=$account->account_number;
-
-
-             // debit
-            $client_new_balancce= (double)DB::table('accounts')->where('account_number',$client_account_number)->value('balance') - (double)$loan_amount;
-            // update amount
-            DB::table('accounts')->where('account_number',$client_account_number)->update(['balance'=>$client_new_balancce ]);
-
-
-            // cledit
-            $partner_new_balance= (double)($account->balance + $loan_amount);
-            DB::table('accounts')->where('id',session()->get('partner_account_id'))->update([
-               'balance'=>$partner_new_balance
-            ]);
-
-
-            // send to partner
-
-
-         }
-
-
-    }
-
-    public function approveAndDisburse($id){
-
-
-        //DB::begginTransaction();
-        //DB::beginTransaction();
-
-        try{
-
-
-
-        $client_data_values=DB::table('members')->where('member_number',LoansModel::where('id',$id)->value('member_number') )->first();
-
-        $client_name=$client_data_values->first_name.' '.$client_data_values->middle_name.' '.$client_data_values->last_name;
-        $client_email=$client_data_values->email;
-        $loan_officer_email=Employee::where('id',$client_data_values->loan_officer)->value('email');
-
-//        Mail::to($client_email)->send(new LoanProgress($loan_officer_email,$client_name,
-//            " We are pleased to confirm that the funds from your loan application have been successfully posted to your specified account.
-//             Should you have any further queries or require assistance, please feel free to contact us.
-//                 "));
-
-
-        // source account number
-        $account_id= DB::table('loan_sub_products')->where('sub_product_id',LoansModel::where('id',$id)->value('loan_sub_product'))->value('disbursement_account');
-        $this->bank1=AccountsModel::where('id',$account_id)->value('account_number');
-
-
+    public function approve($id){
         $this->loadData($id);
-
 
         LoansModel::where('id', $id)->update([
             'status'=> 'ACTIVE',
+            'bank_account_number'=> $this->bank1
         ]);
 
 
-        $member_number = DB::table('loans')->where('id',$id)->value('member_number');
+        $next_due_date = Carbon::now()->toDateTimeString();
 
-        DB::table('members')->where('member_number', $member_number)->update([
-            'client_status'=> 'ACTIVE',
-        ]);
+        foreach ($this->table as $installment) {
 
-
-
-
-
-
-
-            // Prepare an array to hold all the data to be inserted
-            $dataToInsert = [];
-
-
-
-            foreach ($this->table as $installment) {
-
-                $dataToInsert[] = [
-                    'loan_id' => $this->loan_id,
-                    'installment' => $installment['Payment'],
-                    'interest' => $installment['Interest'],
-                    'principle' => $installment['Principle'], // Corrected key name
-                    'balance' => $installment['balance'],
-                    'bank_account_number' => $this->bank1,
-                    'completion_status' => 'PENDING',
-                    'account_status' => 'PENDING',
-                    'installment_date' => $installment['Date'],
-                    'next_check_date' => null, // You can set this if needed
-                    'created_at' => now(), // Assuming you want to set the current timestamp
-                    'updated_at' => now(), // Assuming you want to set the current timestamp
-                    'penalties' => null, // You can set this if needed
-                    'amount_in_arrears' => null, // You can set this if needed
-                    'days_in_arrears' => null, // You can set this if needed
-                    'payment' => null, // You can set this if needed
-                    'promise_date' => null, // You can set this if needed
-                    'comment' => null, // You can set this if needed
-                ];
-
-                //dd($dataToInsert);
-
-            }
-
-            // Use the insert method to insert all records at once
-            try {
-                loans_schedules::insert($dataToInsert);
-                // Insertion successful
-                // You can add any additional logic here if needed
-                //echo "Insertion successful!";
-                //dd("Insertion successful!");
-            } catch (\Exception $e) {
-                // Error occurred during insertion
-                // Handle the exception
-                //echo "Error: " . $e->getMessage();
-                dd("Error: " . $e->getMessage());
-            }
-
-
+            $next_due_date = date('Y-m-d', strtotime($next_due_date. ' +30 days'));
+            $product = new loans_schedules;
+            $product->loan_id = $this->loan_id;
+            $product->installment = $installment['Payment'];
+            $product->interest = $installment['Interest'];
+            $product->principle = $installment['Principle'];
+            $product->balance = $installment['balance'];
+            $product->bank_account_number = $this->bank1;
+            $product->completion_status = "ACTIVE";
+            $product->account_status = "ACTIVE";
+            $product->installment_date = $next_due_date;
+            $product->save();
+        }
 
         foreach ($this->tablefooter as $installment) {
-
+            $next_due_date = date('Y-m-d', strtotime($next_due_date. ' +30 days'));
             $product = new loans_summary;
             $product->loan_id = $this->loan_id;
             $product->installment = $installment['Payment'];
             $product->interest = $installment['Interest'];
-            $product->principal = $installment['Principle']; // Corrected key name
+            $product->principle = $installment['Principle'];
             $product->balance = $installment['balance'];
             $product->bank_account_number = $this->bank1;
-            $product->completion_status = "PENDING";
-            $product->account_status = "PENDING";
+            $product->completion_status = "ACTIVE";
+            $product->account_status = "ACTIVE";
             $product->save();
         }
 
-        $loanPaymentMethod = LoansModel::where('id',$id)->first();
-
-
-        if($loanPaymentMethod->loan_status=="TOPUP"){
-
-            $this->topUp($id);
-
-        }else{
-
-            if($loanPaymentMethod->loan_status=="RESTRUCTURED"){
-
-                LoansModel::where('loan_id',$loanPaymentMethod->restructure_loanId)->update(['status'=>'CLOSED']);
-                loans_schedules::where('loan_id',$loanPaymentMethod->restructure_loanId)->update(['completion_status'=>'CLOSED']);
-            }
-
-            $this->processPayment();
-
-        }
-
-        if($loanPaymentMethod->pay_method == 'MOBILE' || $loanPaymentMethod->pay_method == 'BANK'){
-
-
-            //amount to be transferred
-            $loanAmount = (double)DB::table('members')->where('id',$loanPaymentMethod->client_id)->value('amount');
-
-            $loanSubProduct = Loan_sub_products::where('sub_product_id',$loanPaymentMethod->loan_sub_product)->value('disbursement_account');
-
-            $accountBalance = AccountsModel::where('id',$loanSubProduct)->value('balance');
-            //update disbursement account
-            AccountsModel::where('id',$loanSubProduct)->update([
-                'balance' => DB::raw("balance - $loanAmount")
-            ]);
-            //change........here.....
-//            AccountsModel::where()
-
-
-            AccountsModel::where('id',$loanPaymentMethod->bank)->update([
-                'balance'=> DB::raw("balance - $loanAmount")
-            ]);
-
-
-
-        }
-
-
+        $this->processPayment();
         Session::flash('loan_commit', 'The loan has been Approved!');
         Session::flash('alert-class', 'alert-success');
         Session::put('currentloanID',null);
         Session::put('currentloanMember',null);
         $this->emit('currentloanID');
-
-          //DB::commit();
-        }
-        catch (\Exception $e){
-            DB::rollback();
-
-            return $e->getMessage();
-
-        }
-
-
-    }
-
-
-
-    public function topUp($id){
-
-        $loan=LoansModel::where('id',$id)->first();
-
-        $account=Loan_sub_products::where('sub_product_id',$loan->loan_sub_product)->first();
-
-        //principle account
-        $principle_collection=$account->collection_account_loan_principle;
-        $principle_account_data=AccountsModel::where('id',$principle_collection)->first();
-        $principle_account_number=$principle_account_data->account_number;
-        $principle_prev_balance=$principle_account_data->balance;
-        $total_principle=$loan->total_principle;
-
-
-        // interest transactions
-        $interest_collection=$account->collection_account_loan_interest;
-        $interest_account_data=AccountsModel::where('id',$interest_collection)->first();
-        $interest_account_number=$interest_account_data->account_number;
-        $interest_prev_balance=$interest_account_data->balance;
-        $total_interest=$loan->future_interest;
-
-
-
-
-        //client informations
-        $client_total_amount=$loan->principle;
-        $client_account_number=$loan->loan_account_number;
-
-
-
-
-
-        if($client_total_amount >=($total_principle+$total_interest)){
-
-            // debit client account
-            $client_new_balance=(double)$client_total_amount-(double)$total_principle;
-
-            // update amount which is debited
-            AccountsModel::where('account_number',$client_account_number)->update(['balance'=>$client_new_balance]);
-
-            // credit section  with  principle
-            $principle_collection_account_new_balance=(double)$total_principle + (double)$principle_prev_balance;
-            // update balance
-            AccountsModel::where('account_number',$principle_account_number )->update(['balance'=>$principle_collection_account_new_balance]);
-
-
-            // record on the general ledger
-            $record_on_general_ledger=new general_ledger();
-            //debit
-            $record_on_general_ledger->debit($client_account_number,$client_new_balance
-                ,$principle_account_number,$total_principle,'Loan top up principle transaction',$loan->loan_id);
-
-            // credit
-            $record_on_general_ledger->credit($principle_account_number,$principle_collection_account_new_balance,
-                $client_account_number,$total_principle,'Loan top up principle transaction',$loan->loan_id);
-
-
-
-
-            // interest transactions
-            $client_new_balance=$client_new_balance-(double)$total_interest;
-            //update amount
-            AccountsModel::where('account_number',$client_account_number)->update(['balance'=>$client_new_balance]);
-
-            // credit section with interest
-            $interest_collection_new_balance=(double)$interest_prev_balance + (double)$total_interest;
-            // update balance
-            AccountsModel::where('account_number',$interest_account_number)->update(['balance'=>$interest_collection_new_balance]);
-
-
-            //debit
-            $record_on_general_ledger->debit($client_account_number,$client_new_balance
-                ,$interest_account_number,$total_interest,'Loan top up interest transaction',$loan->loan_id);
-
-            //credit interest
-            $record_on_general_ledger->credit($interest_account_number,$interest_collection_new_balance,
-                $client_account_number,$total_interest,'Loan top up interest transaction',$loan->loan_id);
-
-
-            Session::flash('loan_commit', 'The loan has been Approved!');
-            Session::flash('alert-class', 'alert-success');
-            Session::put('currentloanID',null);
-            Session::put('currentloanMember',null);
-            $this->emit('currentloanID');
-
-
-        }else{
-            session()->flash('message_fail','sorry invalid  amount');
-        }
-
-
-
-
-
-
-
     }
 
 
@@ -498,33 +213,41 @@ class LoansTable extends LivewireDatatable
 
     public function processPayment()
     {
-        //debit
-        $savings_ledger_account_prev_balance = (double)AccountsModel::where('account_number', $this->bank1)->value('balance');
-        $savings_ledger_account_new_balance=(double)($savings_ledger_account_prev_balance - $this->principle);
-        AccountsModel::where('account_number', $this->bank1)->update(['balance' => $savings_ledger_account_new_balance]);
 
-        //credit
+        $institution_id = '';
+        $id = auth()->user()->id;
+
+        $mirror_account = AccountsModel::where('account_number', $this->bank1)->value('mirror_account');
+
         $savings_account_new_balance = (double)AccountsModel::where('account_number', $this->loan_account_number)->value('balance') + (double)$this->principle;
+
+        $savings_ledger_account_new_balance = (double)AccountsModel::where('account_number', $mirror_account)->value('balance') - (double)$this->principle;
+
+        $partner_bank_account_new_balance = (double)AccountsModel::where('account_number', $this->bank1)->value('balance') + (double)$this->principle;
+
         AccountsModel::where('account_number', $this->loan_account_number)->update(['balance' => $savings_account_new_balance]);
-        //
+        AccountsModel::where('account_number', $mirror_account)->update(['balance' => $savings_ledger_account_new_balance]);
+        AccountsModel::where('account_number', $this->bank1)->update(['balance' => $partner_bank_account_new_balance]);
 
         $reference_number = time();
+
+
+
         //DEBIT RECORD MEMBER
         general_ledger::create([
             'record_on_account_number' => $this->loan_account_number,
             'record_on_account_number_balance' => $savings_account_new_balance,
-            'sender_branch_id' =>auth()->user()->branch,
-            'beneficiary_branch_id' => auth()->user()->branch,
-            'sender_product_id' =>3,
-            'sender_sub_product_id' => 5,
-            'beneficiary_product_id' => 6,
-            'beneficiary_sub_product_id' =>5,
+            'sender_branch_id' =>1,
+            'beneficiary_branch_id' => 1,
+           // 'sender_product_id' => AccountsModel::where('account_number', $mirror_account)->value('product_number'),
+            //'sender_sub_product_id' => AccountsModel::where('account_number', $mirror_account)->value('sub_product_number'),
+           // 'beneficiary_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('product_number'),
+            'beneficiary_sub_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('sub_product_number'),
             'sender_id' => '999999',
-            'branch_id' => auth()->user()->branch,
-            'beneficiary_id' => 3,
+            'beneficiary_id' => $this->member_number,
             'sender_name' => 'Organization',
-            'beneficiary_name' => DB::table('members')->where('member_number', $this->member_number)->value('first_name') . ' ' . DB::table('members')->where('member_number', $this->member_number)->value('middle_name') . ' ' . DB::table('members')->where('client_number', $this->member_number)->value('last_name'),
-            'sender_account_number' => $this->bank1,
+            'beneficiary_name' => ClientsModel::where('client_number', $this->member_number)->value('first_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('middle_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('last_name'),
+            'sender_account_number' => $mirror_account,
             'beneficiary_account_number' => $this->loan_account_number,
             'transaction_type' => 'IFT',
             'sender_account_currency_type' => 'TZS',
@@ -544,25 +267,60 @@ class LoansTable extends LivewireDatatable
             'partner_bank_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
             'partner_bank_account_number' => $this->bank1,
             'partner_bank_transaction_reference_number' => $reference_number,
+
         ]);
 
+        //CREDIT RECORD SHARE ACCOUNT
+        general_ledger::create([
+            'record_on_account_number' => $this->bank1,
+            'record_on_account_number_balance' => $partner_bank_account_new_balance,
+            'sender_branch_id' => 1,
+            'beneficiary_branch_id' => 1,
+           // 'sender_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('product_number'),
+            //'sender_sub_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('sub_product_number'),
+            //'beneficiary_product_id' => AccountsModel::where('account_number', $this->bank1)->value('product_number'),
+            //'beneficiary_sub_product_id' => AccountsModel::where('account_number', $this->bank1)->value('sub_product_number'),
+            'sender_id' => $this->member_number,
+            'beneficiary_id' => AccountsModel::where('account_number', $this->bank1)->value('institution_number'),
+            'sender_name' => ClientsModel::where('client_number', $this->member_number)->value('first_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('middle_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('last_name'),
+            'beneficiary_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
+            'sender_account_number' => $this->loan_account_number,
+            'beneficiary_account_number' => $this->bank1,
+            'transaction_type' => 'IFT',
+            'sender_account_currency_type' => 'TZS',
+            'beneficiary_account_currency_type' => 'TZS',
+            'narration' => 'Loan Disbursement',
+            'credit' => (double)$this->principle,
+            'debit' => 0,
+            'reference_number' => $reference_number,
+            'trans_status' => 'Successful',
+            'trans_status_description' => 'Successful',
+            'swift_code' => '',
+            'destination_bank_name' => '',
+            'destination_bank_number' => '',
+            'payment_status' => 'Successful',
+            'recon_status' => 'Pending',
+            'partner_bank' => AccountsModel::where('account_number', $this->bank1)->value('institution_number'),
+            'partner_bank_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
+            'partner_bank_account_number' => $this->bank1,
+            'partner_bank_transaction_reference_number' => $reference_number,
+        ]);
 
         //CREDIT RECORD GL
         general_ledger::create([
-            'record_on_account_number' => $this->bank1,
+            'record_on_account_number' => $mirror_account,
             'record_on_account_number_balance' => $savings_ledger_account_new_balance,
             'sender_branch_id' => 1,
             'beneficiary_branch_id' => 1,
-            'sender_product_id' =>3,
-            'sender_sub_product_id' => 3,
-            'beneficiary_product_id' => 34,
-            'beneficiary_sub_product_id' =>2,
+           // 'sender_product_id' => AccountsModel::where('account_number', $mirror_account)->value('product_number'),
+            //'sender_sub_product_id' => AccountsModel::where('account_number', $mirror_account)->value('sub_product_number'),
+           // 'beneficiary_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('product_number'),
+            //'beneficiary_sub_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('sub_product_number'),
             'sender_id' => '999999',
-            'branch_id' => 1,
-            'beneficiary_id' => 3,
-            'sender_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
-            'beneficiary_name' =>'',
-            'sender_account_number' => $this->bank1,
+            'beneficiary_id' => $this->loan_account_number,
+            'sender_name' => AccountsModel::where('account_number', $mirror_account)->value('account_name'),
+            'beneficiary_name' => ClientsModel::where('client_number', $this->member_number)->value('first_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('middle_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('last_name'),
+            'sender_account_number' => $mirror_account,
             'beneficiary_account_number' => $this->loan_account_number,
             'transaction_type' => 'IFT',
             'sender_account_currency_type' => 'TZS',
@@ -587,6 +345,138 @@ class LoansTable extends LivewireDatatable
 
 
     }
+
+
+    public function saveLoanPayments(array $datalist)
+    {
+        $startDate=now();
+        $installmentDate = Carbon::parse($startDate); // Convert the start date to a Carbon instance
+
+        // Insert each record from the detailed payment list into the loans_schedules table
+        foreach ($datalist as $data) {
+            DB::table('loans_schedules')->insert([
+                'payment' => $data['Payment'],
+                'interest' => $data['Interest'],
+                'principal' => $data['Principle'],
+                'balance' => $data['balance'],
+                'installment_date' => $installmentDate->format('Y-m-d'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Increment the installment date by 30 days
+            $installmentDate->addDays(30);
+        }
+
+
+    }
+
+
+    function print_schedule($balance, $rate, $payment)
+    {
+
+
+        $totPayment =0;
+        $totInterest =0;
+        $totPrincipal =0;
+        $datalist = array();
+        $count = 0;
+
+
+        if($rate <=0){
+            $rate=12;
+        }
+
+        if($balance){
+
+        }else{
+            $balance = 0;
+        }
+        if($payment > 0){
+
+        }else{
+            $payment = 0;
+        }
+
+
+
+        while($balance > 0) {
+            $count++;
+
+            // calculate interest on outstanding balance
+            $interest = $balance * $rate / 100;
+
+            // what portion of payment applies to principal?
+            $principal = $payment - $interest;
+
+            // watch out for balance < payment
+            if ($balance < $payment) {
+                $principal = $balance;
+                $payment = $interest + $principal;
+            } // if
+
+            // reduce balance by principal paid
+            if($principal < 0 ){
+                $balance = 0;
+            }else{
+                $balance = $balance - $principal;
+            }
+
+
+            // watch for rounding error that leaves a tiny balance
+            if ($balance < 0) {
+                $principal = $principal + $balance;
+                $interest = $interest - $balance;
+                $balance = 0;
+            } // if
+
+
+//   dd($payment,$interest,$principal,$balance);
+
+            $datalist[] = array(
+                "Payment" => $payment,
+                "Interest" => $interest,
+                "Principle" => $principal,
+                "balance" => $balance
+            );
+
+
+
+
+            @$totPayment = $totPayment + $payment;
+
+            @$totInterest = $totInterest + $interest;
+
+            @$totPrincipal = $totPrincipal + $principal;
+
+
+
+            if ($payment < $interest) {
+
+            } // if
+
+        }
+
+
+
+        $datalistfooter[] = array(
+            "Payment" => $totPayment,
+            "Interest" => $totInterest,
+            "Principle" => $totPrincipal,
+            "balance" => $balance
+        );
+
+
+
+
+        $this->table = $datalist;
+        $this->tablefooter = $datalistfooter;
+        $this->recommended_tenure = $count;
+        $this->recommended_installment = $payment;
+
+
+    } // print_schedule ==================================================================
+
 
 
     public function loadData($id): void
@@ -621,14 +511,9 @@ class LoansTable extends LivewireDatatable
             $this->tenure = $theloan->tenure;
             $this->business_age = $theloan->business_age;
 
-            $this->interest_method=$theloan->interest_method;
-
             $this->status = $theloan->status;
 
         }
-
-
-
         $this->products = Loan_sub_products::where('sub_product_id', $this->loan_sub_product)->get();
 
 
@@ -652,143 +537,98 @@ class LoansTable extends LivewireDatatable
             $this->amortization_method = $product->amortization_method;
 
             $this->days_in_a_month = $product->days_in_a_month;
+
+
         }
 
-        $this->guarantor = DB::table('members')->where('client_number', $this->guarantor)->get();
-        $this->member = DB::table('members')->where('client_number', $this->member_number)->get();
+        $this->guarantor = ClientsModel::where('client_number', $this->guarantor)->get();
+        $this->member = ClientsModel::where('client_number', $this->member_number)->get();
 
-
-        $this->proccessData($id);
+     $this->proccessData($id);
     }
 
 
 
+    public function proccessData($id)   {
 
-    public function proccessData($id)
-    {
+        if($this->tenure){
 
-        $this->generateRepaymentSchedule();
-    }
-
-
-
-    /**
-     * @throws Exception
-     */
-
-
-    function print_schedule($disbursed_amount, $interest_rate, $tenure)
-    {
-
-        $principal = $disbursed_amount;
-        $dailyInterestRate = $interest_rate / 100;
-        $termDays = $tenure;
-
-        $balance = $principal;
-//        $date = new DateTime();
-        $date = Carbon::now()->addDay();
-
-        $datalist = [];
-        $totPayment = 0;
-        $totInterest = 0;
-        $totPrincipal = 0;
-        $dailyInstallment = 0;
-
-
-        for ($i = 0; $i < $termDays; $i++) {
-            $dailyInstallment = ($principal + ($principal * $dailyInterestRate)) / $termDays;
-            $principalPayment = $principal / $termDays;
-            $interest = $dailyInstallment - $principalPayment;
-            $balance -= $principalPayment;
-            $totPayment += $dailyInstallment;
-            $totInterest += $interest;
-            $totPrincipal += $principalPayment;
-
-
-
-            $datalist[] = [
-                "Payment" => $dailyInstallment,
-                "Interest" => $interest,
-                "Principle" => $principalPayment,
-                "balance" => $balance,
-                "Date" => $date->format('Y-m-d')
-            ];
-
-            $date->modify('+1 day');
+        }else{
+            $this->tenure = '12';
+        }
+        if($this->principle){
+            LoansModel::where('id',$id)->update([
+                'principle' => $this->principle,
+                'tenure' => $this->tenure
+            ]);
         }
 
 
-        $this->table = $datalist;
+        $this->loan = LoansModel::where('id', $id)->get();
 
+        foreach ($this->loan as $theloan) {
 
+            $this->principle = $theloan->principle;
 
+            $this->tenure = $theloan->tenure;
 
-        $this->tablefooter = [[
-            "Payment" => $totPayment,
-            "Interest" => $totInterest,
-            "Principle" => $totPrincipal,
-            "balance" => $balance,
-        ]];
-
-        $this->recommended_tenure = $termDays;
-        $this->recommended_installment = $dailyInstallment;
-
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function generateRepaymentSchedule()
-    {
-
-        $this->repaymentPlan = 'Daily';
-
-        if ($this->repaymentPlan == 'Quarterly') {
-            $this->getQuarterlyRepaymentSchedule();
-        } elseif ($this->repaymentPlan == 'Monthly') {
-            $this->getMonthlyRepaymentSchedule();
-        } elseif ($this->repaymentPlan == 'Weekly') {
-            $this->getWeeklyRepaymentSchedule();
-        } elseif ($this->repaymentPlan == 'Daily') {
-            $this->getDailyRepaymentSchedule();
-        } else {
-            throw new Exception("Invalid repayment plan specified.");
         }
+
+
+        $this->monthly_sales = (double)$this->daily_sales * (double)$this->days_in_a_month;
+
+
+        $this->gross_profit = $this->monthly_sales - (double)$this->cost_of_goods_sold;
+        $this->net_profit = $this->gross_profit - (double)$this->monthly_taxes;
+        $this->available_funds = ($this->net_profit - (double)$this->other_expenses) / 2;
+
+        $interest = $this->interest_value / 12;
+
+
+
+            $payment = $this->calc_payment($this->principle, $this->tenure, $interest, 2);
+
+            $this->print_schedule($this->principle, $interest, $payment);
+
+
+
     }
 
-    public function getQuarterlyRepaymentSchedule()
+
+    function calc_payment($pv, $payno, $int, $accuracy)
     {
-        $payment = $this->calc_payment($this->principle, $this->tenure, $this->interest_value, 'quarterly');
-        $this->print_schedule($this->principle, $this->interest_value / 4, $payment, 'quarterly');
-    }
 
 
-    public function getMonthlyRepaymentSchedule()
-    {
-        $payment = $this->calc_payment($this->principle, $this->tenure, $this->interest_value, 'monthly');
-        $this->print_schedule($this->principle, $this->interest_value / 12, $payment, 'monthly');
-    }
+// now do the calculation using this formula:
 
+//******************************************
+//            INT * ((1 + INT) ** PAYNO)
+// PMT = PV * --------------------------
+//             ((1 + INT) ** PAYNO) - 1
+//******************************************
 
-    public function getWeeklyRepaymentSchedule()
-    {
-        $payment = $this->calc_payment($this->principle, $this->tenure, $this->interest_value, 'weekly');
-        $this->print_schedule($this->principle, $this->interest_value / 52, $payment, 'weekly');
-    }
+        $int = $int / 100;
 
+        // convert to a percentage
+        $value1 = $int * pow((1 + $int), $payno);
+        $value2 = pow((1 + $int), $payno) - 1;
+        $pmt = $pv * ($value1 / $value2);
+// $accuracy specifies the number of decimal places required in the result
+        $pmt = number_format($pmt, $accuracy, ".", "");
 
-    public function getDailyRepaymentSchedule()
-    {
+        return $pmt;
 
-
-        $this->print_schedule($this->principle, $this->interest, $this->tenure);
-
-
-    }
-
-
+    } // calc_payment ====================================================================
 
 
 
 }
+
+
+
+
+
+
+
+
 

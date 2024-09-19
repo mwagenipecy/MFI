@@ -13,6 +13,7 @@ class BalanceSheet extends Component
     public $capital_accounts;
 
 
+
     public function render()
     {
         $this->asset_accounts = DB::table('asset_accounts')->get();

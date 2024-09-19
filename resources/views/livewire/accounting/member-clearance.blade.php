@@ -25,7 +25,7 @@
                                     <div>
                                         <button type="button" class="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                                             <?php
-                                            $urlValue=  \App\Models\Members::where('id',Session::get('viewMemberId_details'))->value('profile_photo_path');
+                                            $urlValue=  \App\Models\ClientsModel::where('id',Session::get('viewMemberId_details'))->value('profile_photo_path');
                                             ?>
                                             @if($urlValue)
                                                 <img src="{{$urlValue}}">
@@ -217,7 +217,7 @@
                                                         </td>
                                                         <td class="px-6 py-2">
                                                             <p class="text-sm text-gray-900">
-                                                                {{$employee->membership_number}}
+                                                                {{$employee->client_number}}
                                                             </p>
                                                         </td>
                                                     </tr>
@@ -341,112 +341,112 @@
                             </div>
 
                         </div>
-                        <div class="bg-white items-end justify-end p-3 m-3 rounded-2xl">
+                 <div class="bg-white items-end justify-end p-3 m-3 rounded-2xl">
 
-                            @if (session()->has('message_endMembership'))
-                                <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-8"
-                                     role="alert">
-                                    <div class="flex">
-                                        <div class="py-1">
-                                            <svg class="fill-current h-6 w-6 text-teal-500 mr-4"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 20 20">
-                                                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold">The process is
-                                                completed</p>
-                                            <p class="text-sm">{{ session('message_endMembership') }} </p>
-                                        </div>
-                                    </div>
-                                </div>
+                     @if (session()->has('message_endMembership'))
+                         <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-8"
+                              role="alert">
+                             <div class="flex">
+                                 <div class="py-1">
+                                     <svg class="fill-current h-6 w-6 text-teal-500 mr-4"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          viewBox="0 0 20 20">
+                                         <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                                     </svg>
+                                 </div>
+                                 <div>
+                                     <p class="font-bold">The process is
+                                         completed</p>
+                                     <p class="text-sm">{{ session('message_endMembership') }} </p>
+                                 </div>
+                             </div>
+                         </div>
+                     @endif
+
+                         @if (session()->has('success_message'))
+                         <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-8"
+                              role="alert">
+                             <div class="flex">
+                                 <div class="py-1">
+                                     <svg class="fill-current h-6 w-6 text-teal-500 mr-4"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          viewBox="0 0 20 20">
+                                         <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                                     </svg>
+                                 </div>
+                                 <div>
+                                     <p class="font-bold">The process is
+                                         completed</p>
+                                     <p class="text-sm">{{ session('success_message') }} </p>
+                                 </div>
+                             </div>
+                         </div>
+                     @endif
+
+                 @if(DB::table('members')->where('id',session()->get('viewMemberId_details'))->value('member_status')=="EXIT MEMBER")
+                         @if($this->declineEndMembership)
+
+                             <div class=" justify-end text-right ">
+                                 <div class="">
+                                     <textarea  wire:model="end_membership_description" class="form-input mt-1 block w-full" row="4"></textarea>
+                                 </div>
+                             </div>
+                             <div class="flex justify-end" row="6">
+                                 <div class="">
+                                 <button wire:click="$toggle('declineEndMembership')" class=" p-2 m-4 mt-n2 bg-gray-500 hover:bg-gray-500 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                     Cancel
+                                 </button>
+                                 </div>
+                                 <div class="">
+                                     <button wire:click="declineEndMembership({{session()->get('viewMemberId_details')}})" class=" p-2 m-4 mt-n2 bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                         Confirm
+                                     </button>
+                                 </div>
+                             </div>
+
+                         @else
+
+                   <div class="space-x-4 p-4 flex justify-end items-end">
+                       <div class="fw-bold justify-start">
+                         Exit  document
+                       <livewire:accounting.exit-member-action id="{{session()->get('viewMemberId_details')}}" />
+                     </div>
+                        <div class="justify-end  text-right  ">
+
+                            <button  wire:click="declineEndMembershipModal" class=" mt-n2 bg-red-900 hover:bg-red-800 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Decline
+                            </button>
+
+                            <button wire:click="exitMember({{session()->get('viewMemberId_details')}})" class=" mt-n2 bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Confirm
+                            </button>
                             @endif
-
-                            @if (session()->has('success_message'))
-                                <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-8"
-                                     role="alert">
-                                    <div class="flex">
-                                        <div class="py-1">
-                                            <svg class="fill-current h-6 w-6 text-teal-500 mr-4"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 20 20">
-                                                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold">The process is
-                                                completed</p>
-                                            <p class="text-sm">{{ session('success_message') }} </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-
-                            @if(DB::table('members')->where('id',session()->get('viewMemberId_details'))->value('member_status')=="EXIT MEMBER")
-                                @if($this->declineEndMembership)
-
-                                    <div class=" justify-end text-right ">
-                                        <div class="">
-                                            <textarea  wire:model="end_membership_description" class="form-input mt-1 block w-full" row="4"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-end" row="6">
-                                        <div class="">
-                                            <button wire:click="$toggle('declineEndMembership')" class=" p-2 m-4 mt-n2 bg-gray-500 hover:bg-gray-500 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                        <div class="">
-                                            <button wire:click="declineEndMembership({{session()->get('viewMemberId_details')}})" class=" p-2 m-4 mt-n2 bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                                Confirm
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                @else
-
-                                    <div class="space-x-4 p-4 flex justify-end items-end">
-                                        <div class="fw-bold justify-start">
-                                            Exit  document
-                                            <livewire:accounting.exit-member-action id="{{session()->get('viewMemberId_details')}}" />
-                                        </div>
-                                        <div class="justify-end  text-right  ">
-
-                                            <button  wire:click="declineEndMembershipModal" class=" mt-n2 bg-red-900 hover:bg-red-800 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                                Decline
-                                            </button>
-
-                                            <button wire:click="exitMember({{session()->get('viewMemberId_details')}})" class=" mt-n2 bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                                Confirm
-                                            </button>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                @endif
-
-                                <div class="flex space-x-4 justify-end">
-                                    @if(DB::table('members')->where('id',session()->get('viewMemberId_details'))->value('member_status')=="PENDING")
-                                        <button  wire:click="reject"  class="bg-red-400 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                            Reject
-                                        </button>
-                                        </svg>
-                                        <button wire:click="accept" class="bg-blue-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                            Accept
-                                        </button>
-                                    @endif
-
-                                </div>
-
-
                         </div>
+                   </div>
+
+                     @endif
+
+                     <div class="flex space-x-4 justify-end">
+                         @if(DB::table('members')->where('id',session()->get('viewMemberId_details'))->value('member_status')=="PENDING")
+                         <button  wire:click="reject"  class="bg-red-400 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                             Reject
+                         </button>
+                         </svg>
+                         <button wire:click="accept" class="bg-blue-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                             Accept
+                         </button>
+                         @endif
+
+                     </div>
+
+
+                 </div>
                     </div>
 
                 </div>
 
 
-            @endforeach
+                @endforeach
 
         </div>
     </div>

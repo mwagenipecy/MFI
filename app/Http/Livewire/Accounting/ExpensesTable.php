@@ -16,15 +16,16 @@ use Mediconesystems\LivewireDatatables\Http\Livewire\LivewireDatatable;
 
 class ExpensesTable extends LivewireDatatable
 {
-    public $exportable=true;
+public $exportable=true;
 
 
+protected $listeners = ['refreshExpensesTable' => '$refresh'];
 
 
     public function builder()
     {
 
-        return ExpensesModel::query()->where('status',"PENDING");
+        return ExpensesModel::query()->where('status',"ACTIVE")->orWhere('status',"PAID");
         //->leftJoin('branches', 'branches.id', 'members.branch')
     }
 
@@ -40,12 +41,14 @@ class ExpensesTable extends LivewireDatatable
 
 
             Column::name('id')->label('id')->searchable(),
-            Column::name('amount')->label('amount')->searchable(),
+            Column::callback('amount', function ($amount)  {
+                return number_format($amount,2);
+            })->label('amount')->searchable(),
             Column::name('notes')->label('description ')->searchable(),
-//            Column::callback('client_number',function ($member_number){
-//                return ClientsModel::where('client_number',$member_number)->
-//                selectRaw("CONCAT( first_name,'  ',middle_name,'  ', last_name) as name")->value('name');
-//            })->label('client name')->searchable(),
+            Column::callback('member_number',function ($member_number){
+                return MembersModel::where('client_number',$member_number)->
+                            selectRaw("CONCAT( first_name,'  ',middle_name,'  ', last_name) as name")->value('name');
+            })->label('member name')->searchable(),
 
             Column::name('created_at')->label('submission date'),
             Column::name('status')->label('Status'),
@@ -68,12 +71,13 @@ class ExpensesTable extends LivewireDatatable
                     <span class="hidden text-blue-800 m-2">Pay</span>
                     </button>
                             </div> ';
+
                 $html2='        <span class="bg-green-400 text-green-800 text-sm font-medium mr-2 p-2 rounded dark:bg-green-900 dark:text-green-300">"APPROVED"</span>
 ';
 
 
 
-                $html3 = '<div class="flex items-center space-x-4 flex-lg-row">
+                 $html3 = '<div class="flex items-center space-x-4 flex-lg-row">
 
                 <button  type="button" class="hoverable text-white bg-gray-100 hover:bg-red-200 hover:text-red focus:ring-4 focus:outline-none focus:ring-red-100 font-medium rounded-lg text-sm p-1 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-200 dark:focus:ring-red-200">
             <svg xmlns="http://www.w3.org/2000/svg" fill="red" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
@@ -83,17 +87,18 @@ class ExpensesTable extends LivewireDatatable
         </button>
                                     </div> ';
 
-                if($status=='PENDING'){
+                if($status=='ACTIVE'){
 
                     return $html;
                 }
-                else if($status=="APPROVED"){
-                    return $html2 ;
+                else if($status=="PAID"){
+                    return "" ;
                 }
-                else if($status=="REJECTED"){
-                    return $html3;
-                }
-                return $html;
+                return "";
+
+
+
+
             })->label('Action'),
 
 

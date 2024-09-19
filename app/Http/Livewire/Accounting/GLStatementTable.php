@@ -3,7 +3,7 @@
 namespace App\Http\Livewire\Accounting;
 
 use App\Models\Branches;
-use App\Models\Department;
+use App\Models\Role;
 use App\Models\Employee;
 use App\Models\general_ledger;
 use Illuminate\Support\Facades\Config;
@@ -18,6 +18,7 @@ class GLStatementTable extends LivewireDatatable
 
     protected $listeners = ['refreshMembersTable' => '$refresh'];
     public $exportable = true;
+
 
 
 
@@ -40,6 +41,12 @@ class GLStatementTable extends LivewireDatatable
         return [
             Column::name('created_at')
                 ->label('Date')->searchable(),
+
+            Column::name('sender_name')
+                ->label('Sender')->searchable(),
+
+            Column::name('beneficiary_name')
+                ->label('Receiver')->searchable(),
 
             Column::name('record_on_account_number')
                 ->label('Account Number')->searchable(),

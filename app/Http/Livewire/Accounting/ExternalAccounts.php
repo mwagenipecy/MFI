@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use App\Models\AccountsModel;
-use App\Models\Members;
+use App\Models\ClientsModel;
 use App\Models\Branches;
 use App\Models\Banks;
 use Illuminate\Support\Facades\Session;
@@ -33,7 +33,6 @@ class ExternalAccounts extends Component
 
     public function save()
     {
-    //dd('cv');
 
         $id = AccountsModel::create([
             'account_use' => 'external',
@@ -49,12 +48,8 @@ class ExternalAccounts extends Component
         ])->id;
 
 
-        $user = auth()->user();
-
-
-
         approvals::create([
-            'institution' => auth()->user()->institution_id,
+            'institution' => '10000',
             'process_name' => 'createAccount',
             'process_description' => 'has added a new account',
             'approval_process_description' => 'has approved a new account',

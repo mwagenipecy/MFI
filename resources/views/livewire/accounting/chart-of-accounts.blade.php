@@ -1,65 +1,67 @@
-<div class="lg:w-2/3">
+<div class="w-full">
     <!-- message container -->
 
     <div>
 
         <div class="flex">
 
-            <div class="container mx-auto ">
+            <div class=" w-full container mx-4 ">
 
                 @if($this->createNewAccount)
 
-                    <div class="w-full">
-                        <!-- message container -->
-                        <div>
-                            @if (session()->has('message'))
+                <div class="w-full">
+                    <!-- message container -->
+                    <div>
+                        @if (session()->has('message'))
 
-                                @if (session('alert-class') == 'alert-success')
-                                    <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-8" role="alert">
-                                        <div class="flex">
-                                            <div class="py-1"><svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
-                                            <div>
-                                                <p class="font-bold">The process is completed</p>
-                                                <p class="text-sm">{{ session('message') }} </p>
-                                            </div>
+                            @if (session('alert-class') == 'alert-success')
+                                <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-8" role="alert">
+                                    <div class="flex">
+                                        <div class="py-1"><svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                                        <div>
+                                            <p class="font-bold">The process is completed</p>
+                                            <p class="text-sm">{{ session('message') }} </p>
                                         </div>
                                     </div>
-                                @endif
+                                </div>
                             @endif
+                        @endif
+                    </div>
+
+
+                    <div class="bg-gray-100 rounded px-1 rounded-lg shadow-sm  pt-4 pb-4 ">
+
+                        <div class="flex items-center text-sm mb-2 font-semibold spacing-sm text-slate-600" >CREATE INTERNAL ACCOUNT
+
                         </div>
+                        <div class="flex items-stretch">
 
+                            <div class="w-1/2 mr-2" >
 
-                        <div class="bg-gray-100 rounded px-6 rounded-lg shadow-sm  pt-4 pb-4 ">
+                                <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Select Category</label>
+                                <select wire:model.bounce="category" name="category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option selected value="">Select</option>
+                                    @foreach(DB::table('GL_accounts')->get() as $account)
+                                        <option  value="{{$account->account_name}}">{{$account->account_name}}</option>
+                                    @endforeach
+                                </select>
+                                @error('category')
+                                <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
+                                    <p>Branch is mandatory.</p>
+                                </div>
+                                @enderror
+                                <div class="mt-2"></div>
 
-                            <div class="flex items-center text-sm mb-2 font-semibold spacing-sm text-slate-600" >CREATE INTERNAL ACCOUNT
+                                @if($this->category)
 
-                            </div>
-                            <div class="flex items-stretch">
+{{--                                    @if($this->category==1000)--}}
 
-                                <div class="w-1/2 mr-2" >
-
-                                    <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Select Category</label>
-                                    <select wire:model.bounce="category" name="category" id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                        <option selected value="">Select</option>
-                                        @foreach(DB::table('GL_accounts')->get() as $account)
-                                            <option  value="{{$account->account_code}}">{{$account->account_name}}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('category')
-                                    <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
-                                        <p>Branch is mandatory.</p>
-                                    </div>
-                                    @enderror
-                                    <div class="mt-2"></div>
-
-                                    @if($this->category)
-
-                                        {{--                                    @if($this->category==1000)--}}
+                                    {{$this->sub_category_name}}
 
                                         <label for="sub_category_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Select Sub Category</label>
                                         <select wire:model.bounce="sub_category_name" name="sub_category_name" id="sub_category_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                             <option selected value="">Select</option>
-                                            @foreach(DB::table($account->account_name)->get() as $account)
+                                            @foreach(DB::table($this->category)->get() as $account)
                                                 <option  value="{{$account->category_name}}">{{$account->category_name}}</option>
                                             @endforeach
                                         </select>
@@ -70,98 +72,81 @@
                                         @enderror
                                         <div class="mt-2"></div>
 
-                                        {{--                                    @endif--}}
-                                        @if($this->sub_category_name)
+{{--                                    @endif--}}
+                                    @if($this->sub_category_name)
 
-                                            <x-jet-label for="account_name" value="{{ __('Account Name') }}" />
-                                            <x-jet-input id="account_name" type="text" name="account_name" class="mt-1 block w-full" wire:model.bounce="account_name" autofocus />
-                                            @error('account_name')
-                                            <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
-                                                <p>Notes is mandatory and should be more than two characters.</p>
-                                            </div>
-                                            @enderror
-
-
-                                            <div class="mt-2"></div>
-                                            <x-jet-label for="account_code" value="{{ __('Account code') }}" />
-                                            <x-jet-input id="account_code" type="text" name="notes" class="mt-1 block w-full" wire:model.bounce="account_code" autofocus />
-                                            @error('account_code')
-                                            <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
-                                                <p>Notes is mandatory and should be more than two characters.</p>
-                                            </div>
-                                            @enderror
-
-                                            <div class="mt-2"></div>
-                                            <x-jet-label for="notes" value="{{ __('Enter Notes') }}" />
-                                            <x-jet-input id="notes" type="text" name="notes" class="mt-1 block w-full" wire:model.bounce="notes" autofocus />
-                                            @error('notes')
-                                            <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
-                                                <p>Notes is mandatory and should be more than two characters.</p>
-                                            </div>
-                                            @enderror
-
-                                        @endif
-
-
-
-
-
-                                    @endif
-                                    <div class="mt-2"></div>
-
-                                    @if($this->notes && $this->account_name && $this->category)
-
-                                        <div class="flex items-center justify-between text-sm mb-2 font-semibold spacing-sm text-slate-600
-                                    border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
-                                            <p>Account Number</p>
-                                            <p>{{$this->account_number}}</p>
+                                        <x-jet-label for="account_name" value="{{ __('Account Name') }}" />
+                                        <x-jet-input id="account_name" type="text" name="account_name" class="mt-1 block w-full" wire:model.bounce="account_name" autofocus />
+                                        @error('account_name')
+                                        <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
+                                            <p>Notes is mandatory and should be more than two characters.</p>
                                         </div>
+                                        @enderror
+
+
+
+
+                                        <div class="mt-2"></div>
+                                        <x-jet-label for="notes" value="{{ __('Enter Notes') }}" />
+                                        <x-jet-input id="notes" type="text" name="notes" class="mt-1 block w-full" wire:model.bounce="notes" autofocus />
+                                        @error('notes')
+                                        <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
+                                            <p>Notes is mandatory and should be more than two characters.</p>
+                                        </div>
+                                        @enderror
 
                                     @endif
-                                    <div class="mt-2"></div>
-
-                                </div>
 
 
-                                <div class="w-1/2 ml-2" >
 
 
-                                </div>
 
+                                @endif
+                                <div class="mt-2"></div>
 
 
                             </div>
 
 
-                            <div class="flex justify-end w-auto" >
-                                <div wire:loading wire:target="save" >
-                                    <button class="text-white bg-blue-400 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-400 dark:hover:bg-blue-400 dark:focus:ring-blue-400" disabled>
-                                        <div class="flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin  h-5 w-5 mr-2 stroke-white-800" fill="white" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            <div class="w-1/2 ml-2" >
 
-                                            </svg>
-                                            <p>Please wait...</p>
-                                        </div>
-                                    </button>
-                                </div>
 
                             </div>
 
 
-                            <div class="flex justify-end w-auto" >
-                                <div wire:loading.remove wire:target="save" >
-                                    <button wire:click="save" class="text-white bg-blue-400 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-400 dark:hover:bg-blue-400 dark:focus:ring-blue-400">
-                                        Save
-                                    </button>
 
-                                </div>
+                        </div>
+
+
+                        <div class="flex justify-end w-auto" >
+                            <div wire:loading wire:target="save" >
+                                <button class="text-white bg-blue-400 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-400 dark:hover:bg-blue-400 dark:focus:ring-blue-400" disabled>
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin  h-5 w-5 mr-2 stroke-white-800" fill="white" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+
+                                        </svg>
+                                        <p>Please wait...</p>
+                                    </div>
+                                </button>
                             </div>
 
                         </div>
 
 
+                        <div class="flex justify-end w-auto" >
+                            <div wire:loading.remove wire:target="save" >
+                                <button wire:click="save" class="text-white bg-blue-400 hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-400 dark:hover:bg-blue-400 dark:focus:ring-blue-400">
+                                    Save
+                                </button>
+
+                            </div>
+                        </div>
+
                     </div>
+
+
+                </div>
 
                 @endif
 
@@ -169,7 +154,7 @@
                 <div class="flex flex-col w-full" >
                     <div class="grid gap-4 grid-cols-1 sm:grid-cols-3 my-2 w-full">
 
-                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 1) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4 max-w-72 w-full" >
+                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 1) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4 w-full" >
 
 
                             <div class="flex justify-between items-center w-full">
@@ -218,7 +203,7 @@
 
 
 
-                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 2) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4 max-w-72 w-full" >
+                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 2) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4  w-full" >
 
                             <div class="flex justify-between items-center w-full">
                                 <div class="flex items-center">
@@ -296,7 +281,7 @@
 
 
 
-                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 3) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4 max-w-72 w-full" >
+                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 3) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4  w-full" >
 
                             <div class="flex justify-between items-center w-full">
                                 <div class="flex items-center">
@@ -378,7 +363,7 @@
                     </div>
                     <div class="grid gap-4 grid-cols-1 sm:grid-cols-3 my-2 w-full">
 
-                        <div class="metric-card  dark:bg-gray-900 border @if($this->item == 4) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4 max-w-72 w-full" >
+                        <div class="metric-card  dark:bg-gray-900 border @if($this->item == 4) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4  w-full" >
 
                             <div class="flex justify-between items-center w-full">
                                 <div class="flex items-center">
@@ -455,7 +440,7 @@
                         </div>
 
 
-                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 5) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4 max-w-72 w-full" >
+                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 5) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4   w-full" >
 
                             <div class="flex justify-between items-center w-full">
                                 <div class="flex items-center">
@@ -530,7 +515,7 @@
                             </table>
                         </div>
 
-                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 6) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4 max-w-72 w-full" >
+                        <div  class="metric-card  dark:bg-gray-900 border @if($this->item == 6) bg-blue-200 border-blue-200 dark:border-blue-800  @else bg-white  border-gray-200 dark:border-gray-800 @endif rounded-lg p-4   w-full" >
 
                             <div class="flex justify-between items-center w-full">
                                 <div class="flex items-center">
@@ -614,21 +599,21 @@
 
         </div>
 
-        <hr class="border-b-0 my-4"/>
+        <hr class="boder-b-0 my-4"/>
 
         <div class="bg-white rounded rounded-lg shadow-sm">
 
-{{--            @if($this->item == 1)--}}
-{{--                <livewire:accounting.number-of-products--}}
-{{--                        exportable--}}
-{{--                        searchable="sub_product_name"--}}
-{{--                />--}}
-{{--            @else--}}
-{{--                <livewire:accounting.other-data--}}
-{{--                        exportable--}}
-{{--                        searchable="member,account_number,status"--}}
-{{--                />--}}
-{{--            @endif--}}
+            @if($this->item == 1)
+                <livewire:accounting.number-of-products
+                        exportable
+                        searchable="sub_product_name"
+                />
+            @else
+                <livewire:accounting.other-data
+                        exportable
+                        searchable="member,account_number,status"
+                />
+            @endif
 
 
         </div>

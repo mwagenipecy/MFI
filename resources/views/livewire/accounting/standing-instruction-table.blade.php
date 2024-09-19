@@ -1,3 +1,3 @@
 <div>
-    {{-- A good traveler has no fixed plans and is not intent upon arriving. --}}
+    {{-- Nothing in the world is as soft and yielding as water. --}}
 </div>

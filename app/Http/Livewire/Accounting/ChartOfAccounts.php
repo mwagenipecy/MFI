@@ -62,7 +62,6 @@ class ChartOfAccounts extends Component
 
 
 
-    
 
 
     public function render()
@@ -88,7 +87,7 @@ class ChartOfAccounts extends Component
 
         $team = $user->currentTeam;
 
-        $category_code=DB::table($this->sub_category_name)->value('category_code');
+         $category_code=DB::table($this->sub_category_name)->value('category_code');
 
         $category_code=substr($category_code,0,2);
         $category_code=$category_code.''.rand(00,99);
@@ -99,20 +98,20 @@ class ChartOfAccounts extends Component
         $category_code='5400';
         $plug_category_code=['5400','5433'];
         foreach ($plug_category_code as $code){
-            if($code==$category_code){
-                continue;
-            }
-            else{
-                break;
-            }
+           if($code==$category_code){
+               continue;
+           }
+           else{
+               break;
+           }
         }
 
-        $table_name=DB::table('GL_accounts')->where('id',$this->category)->value('account_name');
+        $table_name=DB::table('GL_accounts')->where('account_name',$this->category)->value('account_name');
         $table_name=strtolower($table_name);
         $table_name=str_replace($table_name,' ','_');
 
-        $GN_account_code=DB::table('GL_accounts')->where('id',$this->category)->value('account_code');
-        $account_id=DB::table('GL_accounts')->where('id',$this->category)->value('id');
+        $GN_account_code=DB::table('GL_accounts')->where('account_name',$this->category)->value('account_code');
+        $account_id=DB::table('GL_accounts')->where('account_name',$this->category)->value('id');
 
 
 
@@ -154,36 +153,71 @@ class ChartOfAccounts extends Component
 //        }
 
 
+            $category_code = DB::table($this->category)->where('category_name', $this->sub_category_name)->value('category_code');
+            $sub_category_codes = DB::table($this->sub_category_name)->get();
+            /// Extract the first category_code
+            $category_code = $sub_category_codes->first()->category_code;
 
-        $id = DB::table($this->sub_category_name)->insert(['expenses_account_code' => $GN_account_code, 'account_code' => $this->account_code, 'name' => $this->account_name]);
+            // Calculate the range start and limit
+            $range_start = intval($category_code) + 1;
+            $range_limit = intval($category_code) + 999;
+
+            // Extract existing sub_category_codes
+            $existing_codes = $sub_category_codes->pluck('sub_category_code')->toArray();
+
+            // Start with the lowest possible sub_category_code within the range
+            $next_code = $range_start;
+
+            // Generate the next unique sub_category_code within the range
+            while (in_array(strval($next_code), $existing_codes) && $next_code <= $range_limit) {
+                $next_code++;
+            }
+
+            // Check if the next_code is within the range
+            if ($next_code > $range_limit) {
+                $next_code = null;
+            }
+
+            // Print the next unique sub_category_code
+            if ($next_code !== null) {
+                //dd($next_code);
+            } else {
+                //dd('no');
+            }
+
+            $id = DB::table($this->sub_category_name)->insert(
+                [
+                    'category_code' => $GN_account_code,
+                    'sub_category_code' => $next_code,
+                    'sub_category_name' => $this->account_name
+                ]);
 
 
-        $id = AccountsModel::create([
-            'account_use' => 'internal',
-            'institution_number' => auth()->user()->institution_id,
-            'branch_number' => auth()->user()->branch,
-            'member_number' => '0000',
-            'major_category_code' => $GN_account_code,
-            'category_code'=>$this->category_code,
-            'sub_category_code' => $this->account_code,
-            'account_name' => $this->account_name,
-            'account_number' => str_pad(auth()->user()->institution_id, 2, 0, STR_PAD_LEFT) . '' . str_pad(auth()->user()->branch, 2, 0, STR_PAD_LEFT) . '0000'.$this->account_code,
-            'notes' => "  ",
+            $id = AccountsModel::create([
+                'account_use' => 'internal',
+                'institution_number' => auth()->user()->institution_id,
+                'branch_number' => auth()->user()->branch,
+                'major_category_code' => $GN_account_code,
+                'category_code'=>$category_code,
+                'sub_category_code' => $next_code,
+                'account_name' => $this->account_name,
+                'account_number' => str_pad(auth()->user()->institution_id, 2, 0, STR_PAD_LEFT) . '' . str_pad(auth()->user()->branch, 2, 0, STR_PAD_LEFT) . '0000'.$next_code,
+                'notes' => "  ",
 
-        ])->id;
+            ])->id;
 
 
-//        approvals::create([
-//            'institution' => $institution,
-//            'process_name' => 'createAccount',
-//            'process_description' => 'has added a new account',
-//            'approval_process_description' => 'has approved a new account',
-//            'process_code' => '04',
-//            'process_id' => $id,
-//            'process_status' => 'Pending',
-//            'user_id'  => Auth::user()->id,
-//            'team_id'  => ''
-//        ]);
+        approvals::create([
+            'institution' => '1000',
+            'process_name' => 'createAccount',
+            'process_description' => 'has added a new account',
+            'approval_process_description' => 'has approved a new account',
+            'process_code' => '04',
+            'process_id' => $id,
+            'process_status' => 'Pending',
+            'user_id'  => Auth::user()->id,
+            'team_id'  => ''
+        ]);
 
 
         $this->resetData();
@@ -216,9 +250,9 @@ class ChartOfAccounts extends Component
         $this->accountSelected = $account;
     }
 
-    public function showDiv(){
-        $this->createNewAccount = true;
-    }
+        public function showDiv(){
+            $this->createNewAccount = true;
+        }
 
 
 }

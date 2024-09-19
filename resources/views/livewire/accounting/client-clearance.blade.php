@@ -217,7 +217,7 @@
                                                         </td>
                                                         <td class="px-6 py-2">
                                                             <p class="text-sm text-gray-900">
-                                                                {{$employee->membership_number}}
+                                                                {{$employee->client_number}}
                                                             </p>
                                                         </td>
                                                     </tr>

@@ -23,7 +23,7 @@ class ChequeBook extends LivewireDatatable
 
 
 
-        return ChequeBookModel::query();// You can modify the ordering as per your requirement
+            return ChequeBookModel::query();// You can modify the ordering as per your requirement
 
 
     }
@@ -42,7 +42,7 @@ class ChequeBook extends LivewireDatatable
 
             Column::name('remaining_leaves')->label('remaining leaves'),
 
-            Column::callback('bank',function ($bank){
+              Column::callback('bank',function ($bank){
                 return  AccountsModel::where('id',$bank)->value('account_name').'('. AccountsModel::where('id',$bank)->value('account_number').')';
             })->label('bank'),
 

@@ -26,7 +26,8 @@ class CashAccountsTable extends LivewireDatatable
     public function builder(): \Illuminate\Database\Eloquent\Builder
     {
         return AccountsModel::query()
-            ->where('major_category_code','1000')->where('account_use','internal');
+            ->where('institution_number',auth()->user()->institution_id)
+            ->where('category_code','1000');
     }
 
 
@@ -47,7 +48,6 @@ class CashAccountsTable extends LivewireDatatable
     }
 
     public function edit($id){
-        //dd('ff');
         $this->emitUp('editAccountsAccount',$id);
     }
 

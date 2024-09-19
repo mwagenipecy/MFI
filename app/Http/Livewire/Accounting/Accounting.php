@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Accounting;
 
 use App\Models\MembersModel;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 
 
 use App\Models\AccountsModel;
-use App\Models\Members;
+use App\Models\ClientsModel;
 use App\Models\TeamUser;
 
 
@@ -99,33 +100,32 @@ class Accounting extends Component
         'blockAccountsAccount' => 'blockAccountsAccountModal',
         'editAccountsAccount' => 'editAccountsAccountModal',
         'financeViewMember'=>'viewMembersData'
-    ];
-
+        ];
 
 
 
 
 
     public function viewMembersData($id){
-        if($this->viewMemberDetails==false){
-            $this->viewMemberDetails=true;
-            session()->put('viewMemberId_details',$id);
+       if($this->viewMemberDetails==false){
+           $this->viewMemberDetails=true;
+           session()->put('viewMemberId_details',$id);
 
-        }
-        else if($this->viewMemberDetails==true){
-            $this->viewMemberDetails=false;
-        }
+       }
+       else if($this->viewMemberDetails==true){
+           $this->viewMemberDetails=false;
+       }
 
 
     }
 
 
 
-    public function setAccount($account){
-        $this->accountSelected = $account;
-        $this->product = AccountsModel::where('account_number', $account)->value('sub_product_number');
-        //dd($this->product_number);
-    }
+        public function setAccount($account){
+            $this->accountSelected = $account;
+            $this->product = AccountsModel::where('account_number', $account)->value('sub_product_number');
+            //dd($this->product_number);
+        }
 
 
 
@@ -151,13 +151,13 @@ class Accounting extends Component
 
     public function updatedAccountsAccount(){
         $AccountsAccountData = AccountsModel::select('account_name', 'account_number', 'mirror_account')
-            ->where('id', '=', $this->AccountsAccount)
-            ->get();
-        foreach ($AccountsAccountData as $AccountsAccount){
-            $this->account_name=$AccountsAccount->account_name;
-            $this->account_number=$AccountsAccount->account_number;
-            $this->mirror_account=$AccountsAccount->mirror_account;
-        }
+        ->where('id', '=', $this->AccountsAccount)
+        ->get();
+    foreach ($AccountsAccountData as $AccountsAccount){
+        $this->account_name=$AccountsAccount->account_name;
+        $this->account_number=$AccountsAccount->account_number;
+        $this->mirror_account=$AccountsAccount->mirror_account;
+    }
     }
 
 
@@ -165,48 +165,66 @@ class Accounting extends Component
     public function updateAccountsAccount(){
 
 
-
-        $user = auth()->user();
-
-
-        $data = [
+        $datax = [
             'account_name' =>$this->account_name,
             'account_number' =>$this->account_number,
             'mirror_account' =>$this->mirror_account
         ];
 
-        //dd($this->AccountsAccount,Auth::user()->id);
 
-        $update_value = approvals::updateOrCreate(
-            [
-                'process_id' => $this->AccountsAccount,
-                'user_id' => Auth::user()->id
+        try {
+            $authUser = Auth::user();
+            $processId = $this->AccountsAccount;
 
-            ],
-            [
-                'institution' => auth()->user()->institution_id,
+            $approval = approvals::where('process_id', $processId)
+                ->where('user_id', $authUser->id)
+                ->first();
+
+            $data = [
+                'institution' => $authUser->institution_id,
                 'process_name' => 'editAccount',
                 'process_description' => 'has edited an account',
                 'approval_process_description' => 'has approved changes to this account',
                 'process_code' => '02',
-                'process_id' => $this->AccountsAccount,
                 'process_status' => 'Pending',
-                'user_id'  => Auth::user()->id,
-                'team_id'  => $this->AccountsAccount,
-                'edit_package'=> json_encode($data)
-            ]
-        );
+                'team_id' => $processId,
+                'edit_package' => json_encode($datax)
+            ];
+
+            if ($approval) {
+                DB::table('approvals')
+                    ->where('id', $approval->id)
+                    ->update($data);
+
+
+            } else {
+                $data['process_id'] = $processId;
+                $data['user_id'] = $authUser->id;
+                $approval = approvals::create($data);
+            }
+        } catch (\Exception $e) {
+            // Handle the exception
+            // Log the error message
+            dd($e->getMessage());
+
+            // Optionally, rethrow the exception if you want it to be handled further up the stack
+            // throw $e;
+
+            // Optionally, return a response or handle the error in a user-friendly way
+            //return response()->json(['error' => 'An error occurred while processing your request.'], 500);
+        }
+
         Session::flash('message', 'Awaiting approval');
         Session::flash('alert-class', 'alert-success');
         $this->resetData();
-        $this->showEditAccountsAccount = false;
+        $this->showAddAccountsAccount = false;
     }
 
 
 
     public function addAccountsAccount(){
-        $branch = Members::where('membership_number',$this->member)->value('branch');
-        $id = Members::where('membership_number', $this->member)->value('id');
+        $branch = ClientsModel::where('client_number',$this->member)->value('branch');
+        $id = ClientsModel::where('client_number', $this->member)->value('id');
 
         $id = AccountsModel::create([
             'account_use' => 'external',
@@ -215,7 +233,7 @@ class Accounting extends Component
             'member_number'=> $this->member,
             'product_number'=> '11',
             'sub_product_number'=> $this->product,
-            'account_name'=> Members::where('membership_number',$this->member)->value('first_name').' '.Members::where('membership_number',$this->member)->value('middle_name').' '.Members::where('membership_number',$this->member)->value('last_name'),
+            'account_name'=> ClientsModel::where('client_number',$this->member)->value('first_name').' '.ClientsModel::where('client_number',$this->member)->value('middle_name').' '.ClientsModel::where('client_number',$this->member)->value('last_name'),
             'account_number'=> str_pad($branch, 2, '0', STR_PAD_LEFT).'111'.str_pad($id, 5, '0', STR_PAD_LEFT),
 
         ])->id;
@@ -278,8 +296,8 @@ class Accounting extends Component
             'beneficiary_sub_product_id'=> AccountsModel::where('account_number',$this->account_number)->value('sub_product_number'),
             'sender_id'=> $this->member,
             'beneficiary_id'=> $this->member,
-            'sender_name'=> Members::where('membership_number',$this->member)->value('first_name').' '.Members::where('membership_number',$this->member)->value('middle_name').' '.Members::where('membership_number',$this->member)->value('last_name'),
-            'beneficiary_name'=> Members::where('membership_number',$this->member)->value('first_name').' '.Members::where('membership_number',$this->member)->value('middle_name').' '.Members::where('membership_number',$this->member)->value('last_name'),
+            'sender_name'=> ClientsModel::where('client_number',$this->member)->value('first_name').' '.ClientsModel::where('client_number',$this->member)->value('middle_name').' '.ClientsModel::where('client_number',$this->member)->value('last_name'),
+            'beneficiary_name'=> ClientsModel::where('client_number',$this->member)->value('first_name').' '.ClientsModel::where('client_number',$this->member)->value('middle_name').' '.ClientsModel::where('client_number',$this->member)->value('last_name'),
             'sender_account_number'=> $this->linked_accounts_account,
             'beneficiary_account_number'=> $this->account_number,
             'transaction_type'=> 'IFT',
@@ -310,8 +328,8 @@ class Accounting extends Component
             'beneficiary_sub_product_id'=> AccountsModel::where('account_number',$this->account_number)->value('sub_product_number'),
             'sender_id'=> $this->member,
             'beneficiary_id'=> $this->member,
-            'sender_name'=> Members::where('membership_number',$this->member)->value('first_name').' '.Members::where('membership_number',$this->member)->value('middle_name').' '.Members::where('membership_number',$this->member)->value('last_name'),
-            'beneficiary_name'=> Members::where('membership_number',$this->member)->value('first_name').' '.Members::where('membership_number',$this->member)->value('middle_name').' '.Members::where('membership_number',$this->member)->value('last_name'),
+            'sender_name'=> ClientsModel::where('client_number',$this->member)->value('first_name').' '.ClientsModel::where('client_number',$this->member)->value('middle_name').' '.ClientsModel::where('client_number',$this->member)->value('last_name'),
+            'beneficiary_name'=> ClientsModel::where('client_number',$this->member)->value('first_name').' '.ClientsModel::where('client_number',$this->member)->value('middle_name').' '.ClientsModel::where('client_number',$this->member)->value('last_name'),
             'sender_account_number'=> $this->linked_accounts_account,
             'beneficiary_account_number'=> $this->account_number,
             'transaction_type'=> 'IFT',
@@ -342,7 +360,7 @@ class Accounting extends Component
             'beneficiary_sub_product_id'=> AccountsModel::where('account_number','5111108827')->value('sub_product_number'),
             'sender_id'=> $this->member,
             'beneficiary_id'=> '999999',
-            'sender_name'=> Members::where('membership_number',$this->member)->value('first_name').' '.Members::where('membership_number',$this->member)->value('middle_name').' '.Members::where('membership_number',$this->member)->value('last_name'),
+            'sender_name'=> ClientsModel::where('client_number',$this->member)->value('first_name').' '.ClientsModel::where('client_number',$this->member)->value('middle_name').' '.ClientsModel::where('client_number',$this->member)->value('last_name'),
             'beneficiary_name'=> 'Organization',
             'sender_account_number'=> $this->linked_accounts_account,
             'beneficiary_account_number'=> '5111108827',
@@ -445,32 +463,32 @@ class Accounting extends Component
 
     }
 
-    public function closeModal(){
-        $this->showCreateNewAccountsAccount = false;
-        $this->showDeleteAccountsAccount = false;
-        $this->showEditAccountsAccount = false;
-    }
-
-    public function confirmPassword(): void
-    {
-        // Check if password matches for logged-in user
-        if (Hash::check($this->password, auth()->user()->password)) {
-            //dd('password matches');
-            $this->delete();
-        } else {
-            //dd('password does not match');
-            Session::flash('message', 'This password does not match our records');
-            Session::flash('alert-class', 'alert-warning');
+        public function closeModal(){
+            $this->showCreateNewAccountsAccount = false;
+            $this->showDeleteAccountsAccount = false;
+            $this->showEditAccountsAccount = false;
         }
-        $this->resetPassword();
+
+        public function confirmPassword(): void
+        {
+            // Check if password matches for logged-in user
+            if (Hash::check($this->password, auth()->user()->password)) {
+                //dd('password matches');
+                $this->delete();
+            } else {
+                //dd('password does not match');
+                Session::flash('message', 'This password does not match our records');
+                Session::flash('alert-class', 'alert-warning');
+            }
+            $this->resetPassword();
 
 
-    }
+        }
 
-    public function resetPassword(): void
-    {
-        $this->password = null;
-    }
+        public function resetPassword(): void
+        {
+            $this->password = null;
+        }
 
     public function delete(): void
     {
@@ -566,10 +584,8 @@ class Accounting extends Component
 
     public function render()
     {
-
-
-        $this->activeAccountsCount = AccountsModel::where('account_status', 'ACTIVE')->count();
-        $this->inactiveAccountsCount = AccountsModel::where('account_status', 'PENDING')->count();
+        $this->activeAccountsCount = AccountsModel::where('account_status', 'Active')->count();
+        $this->inactiveAccountsCount = AccountsModel::where('account_status', 'Pending')->count();
         $this->AccountsList = AccountsModel::get();
         return view('livewire.accounting.accounting');
     }

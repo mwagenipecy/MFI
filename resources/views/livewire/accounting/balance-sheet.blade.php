@@ -16,8 +16,8 @@
 
             <div id="summary">
 
-                <table class="w-full text-sm text-left text-red-100 dark:text-blue-100">
-                    <thead class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                <table class="w-full text-sm text-left text-blue-100 dark:text-blue-100">
+                    <thead class="text-xs text-white uppercase bg-blue-800 dark:text-white">
                     <tr>
                         <th scope="col" class="border-r px-6 py-4 dark:border-neutral-500">
                             Description
@@ -34,7 +34,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr class="bg-red-50 border-b border-red-400 text-black">
+                    <tr class="bg-blue-50 border-b border-blue-400 text-black">
                         <td class="border-r px-6 py-4 dark:border-neutral-500 text-black">
                             Total Assets
                         </td>
@@ -59,7 +59,7 @@
                             {{ number_format($totalIncome, 2) }}
                         </td>
                     </tr>
-                    <tr class="bg-blue-50 border-b border-red-400 text-black">
+                    <tr class="bg-blue-50 border-b border-blue-400 text-black">
                         <td class="border-r px-6 py-4 dark-border-neutral-500">
                             Total Liabilities
                         </td>
@@ -85,7 +85,7 @@
                         </td>
                     </tr >
 
-                    <tr class="bg-red-50 border-b border-red-400 text-black">
+                    <tr class="bg-blue-50 border-b border-blue-400 text-black">
                         <td class="border-r px-6 py-4 dark-border-neutral-500">
                             Total Equity
                         </td>
@@ -112,7 +112,7 @@
                     </tr >
 
 
-                    <tr class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                    <tr class="text-xs text-white uppercase bg-blue-800 dark:text-white">
                         <td class="border-r px-6 py-4 dark-border-neutral-500">
                             Assets = Liabilities + Equity
                         </td>
@@ -147,11 +147,11 @@
                 Details
             </div>
 
-            <table class="w-full text-sm text-left text-red-100 dark:text-blue-100">
+            <table class="w-full text-sm text-left text-blue-100 dark:text-blue-100">
 
                 <div class="">
 
-                    <thead class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                    <thead class="text-xs text-white uppercase bg-blue-800 dark:text-white">
                     <tr>
 
                         <th
@@ -189,7 +189,7 @@
                     @endphp
 
                     @foreach($asset_accounts as $income_account)
-                        <tr class="bg-red-50 border-b border-red-400 text-black">
+                        <tr class="bg-blue-50 border-b border-blue-400 text-black">
                             <td class="whitespace-nowrap border-r px-4 py-2 dark:border-neutral-500 text-sm">
                                 {{ ucwords(str_replace('_', ' ', $income_account->category_name)) }}
                             </td>
@@ -277,7 +277,7 @@
 
 
 
-                <tr class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                <tr class="text-xs text-white uppercase bg-blue-800 dark:text-white">
 
                     <td class="whitespace-nowrap px-6 py-4 font-medium">
                         TOTAL ASSETS
@@ -318,7 +318,7 @@
 
                 <div class="overflow-hidden relative overflow-x-auto rounded-lg mt-4">
 
-                    <thead class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                    <thead class="text-xs text-white uppercase bg-blue-800 dark:text-white">
                     <tr>
 
                         <th
@@ -354,7 +354,7 @@
                         $main_total_expenses= 0;
                     @endphp
                     @foreach($liability_accounts as $expense_account)
-                        <tr class="bg-red-50 border-b border-red-400 text-black">
+                        <tr class="bg-blue-50 border-b border-blue-400 text-black">
                             <td class="whitespace-nowrap border-r px-4 py-2 dark:border-neutral-500 text-sm">
                                 {{ ucwords(str_replace('_', ' ', $expense_account->category_name)) }}
                             </td>
@@ -435,7 +435,7 @@
                         </tr>
                     @endforeach
 
-                    <tr class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                    <tr class="text-xs text-white uppercase bg-blue-800 dark:text-white">
 
                         <td class="whitespace-nowrap px-6 py-4 font-medium">
                             TOTAL LIABILITIES
@@ -484,7 +484,7 @@
 
                 <div class="overflow-hidden relative overflow-x-auto rounded-lg mt-4">
 
-                    <thead class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                    <thead class="text-xs text-white uppercase bg-blue-800 dark:text-white">
                     <tr>
 
                         <th
@@ -520,7 +520,7 @@
                         $main_total_expenses= 0;
                     @endphp
                     @foreach($capital_accounts as $expense_account)
-                        <tr class="bg-red-50 border-b border-red-400 text-black">
+                        <tr class="bg-blue-50 border-b border-blue-400 text-black">
                             <td class="whitespace-nowrap border-r px-4 py-2 dark:border-neutral-500 text-sm">
                                 {{ ucwords(str_replace('_', ' ', $expense_account->category_name)) }}
                             </td>
@@ -601,7 +601,7 @@
                         </tr>
                     @endforeach
 
-                    <tr class="text-xs text-white uppercase bg-red-400 dark:text-white">
+                    <tr class="text-xs text-white uppercase bg-blue-800 dark:text-white">
 
                         <td class="whitespace-nowrap px-6 py-4 font-medium">
                             TOTAL EQUITY

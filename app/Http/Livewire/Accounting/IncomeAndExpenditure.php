@@ -14,7 +14,6 @@ class IncomeAndExpenditure extends Component
 
     public $income_accounts;
 
-  
 
     public function downloadPdf(){
 

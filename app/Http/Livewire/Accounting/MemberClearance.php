@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Session;
 
 use App\Models\approvals;
 use App\Models\TeamUser;
-use App\Models\Members;
+use App\Models\ClientsModel;
 use Illuminate\Support\Facades\Auth;
 
 class MemberClearance extends Component
@@ -26,11 +26,10 @@ class MemberClearance extends Component
     public $showAddUser = false;
     protected $listeners = ['refreshBranchesListComponent' => '$refresh'];
 
-   
 
 
     public function  declineEndMembership($id){
-        Members::where('id',$id)->update(['member_status'=>"ACTIVE",'supervising_officer'=>"FAIL",'end_membership_description'=>$this->end_membership_description]);
+        ClientsModel::where('id',$id)->update(['member_status'=>"ACTIVE",'supervising_officer'=>"FAIL",'end_membership_description'=>$this->end_membership_description]);
         session()->flash('message_endMembership','Process is completed');
         $this->declineEndMembershipModal();
     }
@@ -73,17 +72,17 @@ class MemberClearance extends Component
 
         // update status
 
-        $member= Members::where('id',$id)->first();
-        if($member->supervising_officer=="FAIL"){
+      $member= ClientsModel::where('id',$id)->first();
+      if($member->supervising_officer=="FAIL"){
 
-        }else{
-            $member->update(['supervising_officer'=>auth()->user()->id,'member_status'=>"AWAITING DISBURSEMENT" ]);
-            session()->flash('success_message','successfully  approved');
-        }
+      }else{
+          $member->update(['supervising_officer'=>auth()->user()->id,'member_status'=>"AWAITING DISBURSEMENT" ]);
+          session()->flash('success_message','successfully  approved');
+      }
     }
 
     public function exitMemberDecline($id){
-        Members::where('id',$id)->update(['member_status'=>'ACTIVE']);
+          ClientsModel::where('id',$id)->update(['member_status'=>'ACTIVE']);
     }
 
 
@@ -93,7 +92,7 @@ class MemberClearance extends Component
     public function render()
     {
 //        $institution = TeamUser::where('user_id', Auth::user()->id)->value('institution');
-        $this->member=DB::table('members')->where('id',session()->get('viewMemberId_details'))->get();
+         $this->member=DB::table('members')->where('id',session()->get('viewMemberId_details'))->get();
         return view('livewire.accounting.member-clearance');
     }
 }

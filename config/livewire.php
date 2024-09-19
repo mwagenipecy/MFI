@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'asset_url' => 'http://96.46.181.165/microfinance/MFI/maisha_finance_limited/public',
+    'asset_url' => 'https://maishafastcredit.co.tz',
 
     /*
     |--------------------------------------------------------------------------

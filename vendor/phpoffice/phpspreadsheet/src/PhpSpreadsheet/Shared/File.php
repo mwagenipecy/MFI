@@ -143,7 +143,7 @@ class File
     /**
      * Assert that given path is an existing file and is readable, otherwise throw exception.
      */
-    public static function assertFile(string $filename, string $zipClient = ''): void
+    public static function assertFile(string $filename, string $zipMember = ''): void
     {
         if (!is_file($filename)) {
             throw new ReaderException('File "' . $filename . '" does not exist.');
@@ -153,11 +153,11 @@ class File
             throw new ReaderException('Could not open "' . $filename . '" for reading.');
         }
 
-        if ($zipClient !== '') {
-            $zipfile = "zip://$filename#$zipClient";
+        if ($zipMember !== '') {
+            $zipfile = "zip://$filename#$zipMember";
             if (!self::fileExists($zipfile)) {
                 // Has the file been saved with Windoze directory separators rather than unix?
-                $zipfile = "zip://$filename#" . str_replace('/', '\\', $zipClient);
+                $zipfile = "zip://$filename#" . str_replace('/', '\\', $zipMember);
                 if (!self::fileExists($zipfile)) {
                     throw new ReaderException("Could not find zip member $zipfile");
                 }
@@ -168,7 +168,7 @@ class File
     /**
      * Same as assertFile, except return true/false and don't throw Exception.
      */
-    public static function testFileNoThrow(string $filename, ?string $zipClient = null): bool
+    public static function testFileNoThrow(string $filename, ?string $zipMember = null): bool
     {
         if (!is_file($filename)) {
             return false;
@@ -176,21 +176,21 @@ class File
         if (!is_readable($filename)) {
             return false;
         }
-        if ($zipClient === null) {
+        if ($zipMember === null) {
             return true;
         }
         // validate zip, but don't check specific member
-        if ($zipClient === '') {
+        if ($zipMember === '') {
             return self::validateZipFirst4($filename);
         }
 
-        $zipfile = "zip://$filename#$zipClient";
+        $zipfile = "zip://$filename#$zipMember";
         if (self::fileExists($zipfile)) {
             return true;
         }
 
         // Has the file been saved with Windoze directory separators rather than unix?
-        $zipfile = "zip://$filename#" . str_replace('/', '\\', $zipClient);
+        $zipfile = "zip://$filename#" . str_replace('/', '\\', $zipMember);
 
         return self::fileExists($zipfile);
     }

@@ -282,7 +282,7 @@
                                                 </svg>
                                             @endif
                                         </div>
-                                        <span class="text-sm   @if($this->tab_id == $item) text-white font-bold  @else  text-gray-400 font-semibold  @endif ml-3  hover:text-white "  >{{ \App\Models\menus::where('ID', $item)->first()->menu_name  }} </span>
+                                        <span class="text-sm   @if($this->tab_id == $item) text-white font-bold  @else  text-gray-400 font-semibold  @endif ml-3  hover:text-white "  >{{ \App\Models\menus::where('id', $item)->first()->menu_name  }} - {{$item}} </span>
                                     </div>
                                     <!-- Icon -->
                                     <div class="flex shrink-0 ml-2 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">

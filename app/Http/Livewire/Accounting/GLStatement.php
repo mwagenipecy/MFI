@@ -11,7 +11,13 @@ class GLStatement extends Component
     public $start_date_input;
     public $end_date_input;
 
-  
+    public function boot()
+    {
+        $this->start_date_input = now()->subDays(30)->format('Y-m-d');
+        $this->end_date_input = now()->format('Y-m-d');
+        
+
+    }
 
     public function daterange($data)
     {

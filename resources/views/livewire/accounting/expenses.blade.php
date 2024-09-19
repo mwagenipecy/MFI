@@ -39,39 +39,39 @@
                             <!-- Right Column -->
                             <div class="p-4">
                                 <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold"> Expenses Request </div>
-                                <h2 class="block mt-1 text-lg leading-tight font-medium text-black hover:underline">{{$this->member_name}}
-                                </h2>
+                                <h4 class="block mt-1 text-lg leading-tight font-medium text-black hover:underline">{{$this->member_name}}
+                                </h4>
                                 <p class="mt-2 text-gray-500">
                                     {{$this->description}}
                                 </p>
-
+                                <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
                                 <!-- Data displayed in two columns -->
-                                <div class="mt-4">
-                                    <div class="grid  p-4 w-full gap-2">
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th class="text-left">ACCOUNT  NUMBER</th>
-                                                <th class="text-right">{{$this->source_account}}</th>
-                                            </tr>
-                                            <tr>
-                                                <th class="text-left">ACCOUNT NAME</th>
-                                                <th class="text-right">{{$this->source_account_name}}</th>
-                                            </tr>
-                                            <tr>
-                                                <th class="text-left">AVAILABLE AMOUNT</th>
-                                                <th class="text-right">{{$this->account_balance}}</th>
-                                            </tr>
-                                            </thead>
+                                <div class="mt-4 w-full">
+                                    <div class="grid  w-full gap-2">
+                                       <table class="w-full">
+                                           <thead>
+                                           <tr>
+                                               <th class="text-left">Account Number</th>
+                                               <th class="text-right">{{$this->source_account}}</th>
+                                           </tr>
+                                               <tr>
+                                               <th class="text-left">Account Name</th>
+                                               <th class="text-right">{{$this->source_account_name}}</th>
+                                              </tr>
+                                           <tr>
+                                               <th class="text-left">Available Funds</th>
+                                               <th class="text-right">{{number_format($this->account_balance,2)}} TZS</th>
+                                           </tr>
+                                           </thead>
 
                                             <tbody>
-                                            <tr>
-                                                <td class="text-left">REQUESTED AMOUNT</td>
-                                                <td class="text-right"> {{number_format($this->request_amount)}} TZS</td>
-                                            </tr>
-                                            </tbody>
+                                           <tr>
+                                               <td class="text-left">Requested Amount</td>
+                                               <td class="text-right"> {{number_format($this->request_amount,2)}} TZS</td>
+                                           </tr>
+                                           </tbody>
 
-                                        </table>
+                                       </table>
                                         <!-- Add more data columns as needed -->
                                     </div>
                                 </div>
@@ -97,7 +97,7 @@
                 <x-jet-button class="ml-3"
                               wire:click="updateExpense"
                               wire:loading.attr="disabled">
-                    {{ __('Proceed') }}
+                    {{ __('PAY') }}
                 </x-jet-button>
 
             </div>

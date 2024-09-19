@@ -70,8 +70,8 @@ class NewLoanProduct extends Component
 
 
     protected $rules = [
-        'product_name'=> 'required|min:3|unique:loan_sub_products',
-        'currency'=> 'required|min:2',
+        'sub_product_name'=> 'required|min:3|unique:loan_sub_products',
+       // 'currency'=> 'required|min:2',
         'notes'=> 'required|min:2',
         "disbursement_account"=>'required',
             "collection_account_loan_interest"=>'required',

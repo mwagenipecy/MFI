@@ -29,11 +29,11 @@
 
 
 
-        <div class="bg-gray-100 rounded rounded-lg shadow-sm  p-2">
+            <div class="bg-gray-100 rounded rounded-lg shadow-sm  p-2">
 
-            <livewire:accounting.g-l-statement-table/>
+                <livewire:accounting.g-l-statement-table/>
 
-        </div>
+            </div>
 
     </div>
 
