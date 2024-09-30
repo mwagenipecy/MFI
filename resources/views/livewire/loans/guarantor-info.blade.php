@@ -1,766 +1,146 @@
+<div class="p-2 mt-4 mb-4 ">
+
+<div class="flex justify-between">
 
 <div>
 
+</div>
 
-    <div class="w-full">
-        <!-- message container -->
-        @if (session()->has('message'))
+<button wire:click="menuItemClicked(9)" class="flex hover:text-white text-center items-center 
+             bg-gray-100              text-gray-400 font-semibold             py-2 px-4 rounded-lg" onmouseover="this.style.backgroundColor='#e63b3d'; this.style.color='#333333';" onmouseout="this.style.backgroundColor=''; this.style.color='';">
 
-            <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md mb-8" role="alert">
-                <div class="flex">
-                    <div class="py-1"><svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
-                    <div>
-                        <p class="font-bold">The process is completed</p>
-                        <p class="text-sm">{{ session('message') }} </p>
-                    </div>
-                </div>
-            </div>
-        @endif
-        @if (session()->has('alert-class'))
-            <div class="bg-yellow-100 border-t-4 border-yellow-500 rounded-b text-yellow-900 px-4 py-3 shadow-md mb-8" role="alert">
-                <div class="flex">
-                    <div class="py-1"><svg class="fill-current h-6 w-6 text-yellow-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
-                    <div>
-                        <p class="font-bold">Error !!</p>
-                        <p class="text-sm">{{ session('alert-class') }} </p>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-
-        <div class="w-full h-full grid justify-items-center">
-
-            <div class="flex justify-center px-4 pt-4 pb-4">
-
-
-                <div class=" flex flex-row gap-2">
-
-                        <input wire:model.live.debounce="member_number" type="number" id="member_number" class="inline-flex items-center py-2 px-4 text-sm font-medium text-center text-gray-900
-                            bg-white rounded-lg border border-gray-300 hover:bg-gray-100 focus:ring-4
-                            focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600
-                            dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700
-                         dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Guarantor Number" @disabled(Session::get('disableInputs'))>
-
-                        <input wire:model.bounce="relationship" type="text" id="relationship" class="inline-flex items-center py-2 px-4 text-sm font-medium text-center text-gray-900
-                            bg-white rounded-lg border border-gray-300 hover:bg-gray-100 focus:ring-4
-                            focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600
-                            dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700
-                         dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Relationship" @disabled(Session::get('disableInputs'))>
-
-
-                </div>
-
-
-
-
-                <div class="flex justify-end w-auto" >
-                    <div wire:loading wire:target="set" >
-                        <button class="ml-2 inline-flex items-center py-2 px-4 text-sm font-medium text-center text-gray-900
-                            bg-white rounded-lg border border-gray-300 hover:bg-gray-100 focus:ring-4
-                            focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600
-                            dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700
-                         dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" disabled>
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin  h-5 w-5 mr-2 stroke-white-800" fill="white" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-
-                                </svg>
-                                <p>Please wait...</p>
-                            </div>
-                        </button>
-                    </div>
-
-                </div>
-
-
-                <div class="flex justify-end w-auto" >
-                    <div wire:loading.remove wire:target="set" >
-                        <button wire:click="set" class="ml-2 inline-flex items-center py-2 px-4 text-sm font-medium text-center text-gray-900
-                            bg-white rounded-lg border border-gray-300 hover:bg-gray-100 focus:ring-4
-                            focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600
-                            dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700
-                         dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" @disabled(Session::get('disableInputs'))>
-                            <p class="text-gray-700">Set</p>
-                        </button>
-
-                    </div>
-                </div>
-
-
-
-
-            </div>
-
-          @if($this->member)
-
-
-                @foreach($this->member as $currentClient)
-                    <div class="w-fit m-auto grid justify-items-center">
-                        <div class="w-fit text-center m-4" >
-
-                            <div style="display: flex; justify-content: center;">
-                                @if($currentClient->profile_photo_path)
-                                    <img class="mb-3 w-32 h-32 rounded-full shadow-lg"
-                                         src="{{$currentClient->profile_photo_path}}"
-                                         alt="{{$currentClient->first_name}}"/>
-                                @else
-                                    <img class="mb-3 w-32 h-32 rounded-full shadow-lg" src="{{asset('/images/download-1.png')}}" alt="">
-
-                                @endif
-                            </div>
-                            <p class="text-2xl mt-4 border-b-2 border-b-blue-400 ">{{$currentClient->first_name}} {{$currentClient->middle_name}} {{$currentClient->last_name}}</p>
-                            <p class="m-4">{{$currentClient->address}}</p>
-
+                        <div wire:loading="" wire:target="menuItemClicked(9)">
+                            <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-900 fill-red-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"></path>
+                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"></path>
+                            </svg>
+                        </div>
+                        <div wire:loading.remove="" wire:target="menuItemClicked(9)">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" class="w-4 h-4 mr-2 fill-current">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"></path>
+                            </svg>
 
                         </div>
 
 
 
+                        Add Guarantor
+                    </button>
+</div>
 
+ @switch($this->sub_tab_id)
 
+@case(1)
+  <livewire:loans.guarantor-table />
+  @break
 
+@case(9)
 
-                        <div class="w-full bg-gray-200 rounded-lg pl-2 pr-2 pt-2 pb-2 mb-2 ml-2 mr-2">
-                            <!-- message container -->
 
-                            <div>
-                                <div class="flex">
-                                    <div class="container mx-auto ">
-                                        <div class="flex flex-col w-full" >
-                                            <div class="grid gap-2 grid-cols-1 sm:grid-cols-3 mb-2">
-                                                <div class="metric-card  dark:bg-gray-900 border bg-white  border-gray-200 dark:border-gray-800 rounded-lg p-4 max-w-72 w-full" >
 
-                                                    <table>
-                                                        <tbody class="bg-white">
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Customer Code
+<div class="w-full ">
 
-                                                                </p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->customer_code
 
-    }}
-                                                                </p>
-                                                            </td>
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Present Surname</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->present_surname
+<div class="grid grid-cols-2 gap-4">
 
-    }}
-                                                                </p>
-                                                            </td>
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Birth Surname</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->birth_surname}}
-                                                                </p>
-                                                            </td>
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>First Name</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->first_name}}
-                                                                </p>
-                                                            </td>
+    @if (session()->has('message'))
+        <div class="bg-green-500 text-white p-4 rounded">
+            {{ session('message') }}
+        </div>
+    @endif
 
-                                                        </tr>
 
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Middle Names</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->middle_names}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Full Name</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->full_name}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Number of Spouse</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->number_of_spouse}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Number of Children</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->number_of_children}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Classification of Individual</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->classification_of_individual}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Gender</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->gender}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Date of Birth</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->date_of_birth}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Country of Birth</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->country_of_birth}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Marital Status</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->marital_status}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>   <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Fate Status</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->fate_status}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Social Status</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->social_status}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Residency</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->residency}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Citizenship</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->citizenship}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-
-
-
-
-                                                        </tbody>
-                                                    </table>
-
-
-                                                </div>
-
-
-                                                <div class="metric-card  dark:bg-gray-900 border bg-white  border-gray-200 dark:border-gray-800 rounded-lg p-4 max-w-72 w-full" >
-
-                                                    <table>
-
-                                                        <tbody class="bg-white">
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Nationality</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->nationality}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Employment</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->Employment}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Employer Name</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->employer_name}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Education</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->education}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Income Available</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->income_available}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Monthly Expenses</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->monthly_expenses}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Negative Status of Individual</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->negative_status_of_individual}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Tax Identification Number</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->tax_identification_number}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>National ID</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->national_iD}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Passport Number</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->passport_number}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>   <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Passport Issuer Country</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->passport_issuer_country}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Driving License Number</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->driving_license_number}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Voter's ID</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->voters_iD}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Foreign Unique ID</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->foreign_unique_iD}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Custom ID Number 1</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->custom_id_number_1}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Custom ID Number 2</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->custom_id_number_2}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Main Address</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->main_address}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-
-                                                        </tbody>
-                                                    </table>
-
-
-
-                                                </div>
-
-                                                <div class="metric-card  dark:bg-gray-900 border bg-white  border-gray-200 dark:border-gray-800 rounded-lg p-4 max-w-72 w-full" >
-
-
-                                                    <table>
-
-                                                        <tbody class="bg-white">
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Street</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->street}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Number of Building</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->number_of_building}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Postal Code</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900">
-                                                                    {{$currentClient->postal_code}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Region</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->region}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> District</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->district}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Country</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->country}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>   <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Mobile Phone</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->mobile_phone}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Fixed Line</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->fixed_line}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Email</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->email}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Web Page</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->web_page}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p> Trade Name</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->trade_name}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Legal Form</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->legal_form}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Establishment Date</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->establishment_date}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Registration Country</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->registration_country}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr> <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Industry Sector</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->industry_sector}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-                                                        <tr class="whitespace-nowrap">
-                                                            <td class="px-6 py-4 text-sm text-gray-500 font-semibold">
-                                                                <p>Registration Number</p>
-                                                            </td>
-                                                            <td class="px-6 py-4">
-                                                                <p class="text-sm text-gray-900 whitespace-normal">
-                                                                    {{$currentClient->registration_number}}
-                                                                </p>
-                                                            </td>
-
-                                                        </tr>
-
-
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-                @endforeach
-
-
-            @else
-
-            @endif
-
+        <div class="mb-4">
+            <label for="name">Name</label>
+            <input type="text" id="name" wire:model="name" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500  p-2 border">
+            @error('name') <span class="text-red-500">{{ $message }}</span> @enderror
         </div>
 
+        <div class="mb-4">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" wire:model="dob" class="w-full p-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 border">
+            @error('dob') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
 
+        <div class="mb-4">
+            <label for="nationality">Nationality</label>
+            <input type="text" id="nationality" wire:model="nationality" class="w-full p-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 border">
+            @error('nationality') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
 
+        <div class="mb-4">
+            <label for="address">Address</label>
+            <input type="text" id="address" wire:model="address" class="w-full p-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 border">
+            @error('address') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
 
-    </div>
+        <div class="mb-4">
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" wire:model="phone" class="w-full p-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500  border">
+            @error('phone') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="email">Email</label>
+            <input type="email" id="email" wire:model="email" class="w-full p-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500  border">
+            @error('email') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="id_number">National ID Number</label>
+            <input type="text" id="id_number" wire:model="id_number" class="w-full p-2bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500  border">
+            @error('id_number') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="employment_status">Employment Status</label>
+            <input type="text" id="employment_status" wire:model="employment_status" class="w-full p-2 border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500  ">
+            @error('employment_status') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="employer_details">Employer Details</label>
+            <input type="text" id="employer_details" wire:model="employer_details" class="w-full p-2 border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
+            @error('employer_details') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="income">Income</label>
+            <input type="number" id="income" wire:model="income" class="w-full p-2 border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
+            @error('income') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="assets">Assets</label>
+            <input type="number" id="assets" wire:model="assets" class="w-full p-2 border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ">
+            @error('assets') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="guaranteeType">Guarantee Type</label>
+            <input type="text" id="guaranteeType" wire:model="guaranteeType" class="w-full p-2 border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            @error('guaranteeType') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+      
+
+        <div class="mb-4">
+            <label for="image">Guarantor Image</label>
+            <input type="file" id="image" wire:model="image" class="w-full p-2 border bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            @error('image') <span class="text-red-500">{{ $message }}</span> @enderror
+        </div>
+
+        <button type="submit" wire:click="save"  class="bg-blue-500 text-white p-2 rounded">Save Guarantor</button>
+    
+</div>
 
 </div>
 
+@break
+
+
+@endswitch
+
+
+
+</div>

@@ -754,7 +754,7 @@ class FrontDesk extends Component
         // Fetch all pending schedules for the given loan ID
         $schedules = DB::table('loans_schedules')
             ->where('loan_id', $loan_id)
-            ->whereIn('completion_status', ['PENDING', 'PARTIAL'])
+            ->whereIn('completion_status', ['ACTIVE','PENDING', 'PARTIAL'])
             ->orderBy('installment_date', 'asc')
             ->get();
 

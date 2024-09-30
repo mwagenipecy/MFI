@@ -646,7 +646,7 @@
                         <select wire:model.bounce="loan_officer" name="member1" id="member1"
                                 class="w-full border-gray-300  focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 p-2.5 rounded-md shadow-sm text-sm">
                             <option selected value="">Select</option>
-                            @foreach(App\Models\Employee::where('employee_status',"ACTIVE")->get() as $members)
+                            @foreach(App\Models\Employee::where('employee_status',"ACTIVE")->where('department',5)->get() as $members)
                                 <option value="{{$members->id}}">{{$members->first_name}} {{$members->middle_name}} {{$members->last_name}}</option>
                             @endforeach
 

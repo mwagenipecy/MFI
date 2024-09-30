@@ -28,14 +28,7 @@ class ClientsTable extends LivewireDatatable
     public function builder()
     {
 
-        if(DB::table('departments')->where('id',auth()->user()->department)->value('department_name')=="MANAGEMENT"){
-
-            return MembersModel::query()->where('client_status','ACTIVE');
-        }else{
-         $clientId=LoansModel::where('supervisor_id',auth()->user()->employeeId)->pluck('client_number');
-        return MembersModel::query()->whereIn('member_number',$clientId)->where('client_status','ACTIVE');
-
-        }
+        return MembersModel::query()->where('client_status','ACTIVE');
     }
 
     public function viewClient($memberId){

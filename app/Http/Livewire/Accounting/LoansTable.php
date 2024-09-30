@@ -563,7 +563,7 @@ class LoansTable extends LivewireDatatable
             ]);
         }
 
-
+        $loan_sub_product = "";
         $this->loan = LoansModel::where('id', $id)->get();
 
         foreach ($this->loan as $theloan) {
@@ -571,6 +571,8 @@ class LoansTable extends LivewireDatatable
             $this->principle = $theloan->principle;
 
             $this->tenure = $theloan->tenure;
+
+            $loan_sub_product = $theloan->loan_sub_product;
 
         }
 
@@ -582,7 +584,13 @@ class LoansTable extends LivewireDatatable
         $this->net_profit = $this->gross_profit - (double)$this->monthly_taxes;
         $this->available_funds = ($this->net_profit - (double)$this->other_expenses) / 2;
 
-        $interest = $this->interest_value / 12;
+        //dd($this->loan);
+
+        $months = DB::table('loan_sub_products')->where('sub_product_id',$loan_sub_product)->value('interest_tenure');
+
+        $interest = (int)$this->interest_value / (int)$months;
+
+        //$interest = $this->interest_value;
 
 
 

@@ -13,9 +13,48 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Traits\MailSender;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Http\Request;
+
+
+
+
+Route::get('register-user',function(){
+
+
+   $employees = DB::table('employees')->get();  // Fetch all employees
+
+    // Step 2: Loop through each employee and insert or update the users table
+    foreach ($employees as $employee) {
+        
+        // Hash the default password '1234567890'
+        $hashedPassword = Hash::make('1234567890');
+
+        // Step 3: Insert into the users table (or update if the email already exists)
+        User::updateOrCreate(
+            ['email' => $employee->email], // Check by email to avoid duplicates
+            [
+                'name' => $employee->first_name.' '.$employee->last_name,
+                 'department'=>$employee->department,
+		 'branch'=> $employee->branch,
+                'employeeId' => $employee->id,  // Assuming there's a phone number field
+                'password' => $hashedPassword, // Default password
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+    }
+
+    return "Employees data successfully transferred to users table.";
+
+
+});
+
+
+
+
 
 Route::get('/website', function (Request $request) {
     // Get the email query parameter from the request
