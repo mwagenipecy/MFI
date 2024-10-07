@@ -49,7 +49,7 @@ class VerifyOtp extends Component
         $name=auth()->user()->name;
         $otp=$this->otp;
 
-        Mail::to(auth()->user()->email)->send(new OTP($link,$name,$otp));
+      //  Mail::to(auth()->user()->email)->send(new OTP($link,$name,$otp));
 
     }
 

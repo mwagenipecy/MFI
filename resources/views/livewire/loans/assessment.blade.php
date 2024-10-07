@@ -18,19 +18,68 @@
 
             <div class="mt-2"></div>
 
+
+
             <div class="flex w-full space-x-4">
                 <!-- Interest Input -->
                 <div class="w-1/2">
-                    <label for="interest" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Interest </label>
+                    <label for="tenure" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"> Interest Type </label>
+                    <select type="number" id="tenure" name="tenure" value="12" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" wire:model="interest_type" @disabled(Session::get('disableInputs')) value="1" >
+
+                     <option value="percent">
+        Percent
+
+                     </option>
+
+                     <option value="fixed">
+                        Fixed
+
+                                     </option>
+
+                    </select>
+                    @error('tenure')
+                    <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
+                        <p>Tenure is mandatory and should be more than two characters.</p>
+                    </div>
+                    @enderror
+                </div>
+
+
+                @if($interest_type=="fixed")
+
+
+
+                <div class="w-1/2">
+                    <label for="interest" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">  Amount </label>
+
                     <input type="number" id="interest" name="interest" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                     focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
-                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" wire:model="interest" @disabled(Session::get('disableInputs')) value="1" required>
+                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" wire:model="interest_amount" @disabled(Session::get('disableInputs')) value="1" required>
                     @error('interest')
                     <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
                         <p>Interest is mandatory.</p>
                     </div>
                     @enderror
                 </div>
+
+                @else
+
+                <div class="w-1/2">
+                    <label for="interest" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Interest </label>
+
+                    <input type="number" id="interest" name="interest" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                    focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" wire:model="interest" @disabled(Session::get('disableInputs')) value="1" required>
+
+                    @error('interest')
+                    <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
+                        <p>Interest is mandatory.</p>
+                    </div>
+                    @enderror
+                </div>
+                @endif
 
                 <!-- Tenure Input -->
                 <div class="w-1/2">
@@ -44,6 +93,12 @@
                     </div>
                     @enderror
                 </div>
+
+
+                   <!-- Tenure Input -->
+
+
+
             </div>
 
             <div class="mt-2"></div>

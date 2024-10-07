@@ -24,7 +24,7 @@ class Assessment extends Component
     public $collateral_type, $collateral_description, $daily_sales, $loan, $collateral_value, $loan_sub_product;
     public $tenure = 0;
     public $principle = 0;
-    public $member, $guarantor, $disbursement_account, $collection_account_loan_interest;
+    public $member,$interest_type, $guarantor, $disbursement_account, $collection_account_loan_interest;
     public $collection_account_loan_principle, $collection_account_loan_charges, $collection_account_loan_penalties;
     public $principle_min_value, $principle_max_value, $min_term, $max_term, $interest_value;
     public $principle_grace_period, $interest_grace_period, $amortization_method;
@@ -33,7 +33,7 @@ class Assessment extends Component
     public $interest = 0;
     public $business_licence_number, $business_tin_number, $business_inventory, $cash_at_hand;
     public $cost_of_goods_sold, $operating_expenses, $monthly_taxes, $other_expenses, $monthly_sales;
-    public $gross_profit;
+    public $gross_profit, $interest_amount;
         public $table = [];
         public $tablefooter  = [];
         public $recommended_tenure, $recommended_installment;
@@ -131,6 +131,15 @@ class Assessment extends Component
 
     }
 
+
+    function newInterest(){
+
+        $amount=$this->principle;
+        $interest_amount=$this->interest_amount;
+        $this->interest= ($interest_amount/$amount)* 100;
+
+    }
+
     private function loadProductDetails(): void
     {
         $this->products = Loan_sub_products::where('sub_product_id', $this->loan_sub_product)->get();
@@ -159,6 +168,10 @@ class Assessment extends Component
 
     public function render(): Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
+
+    if($this->interest_type =="fixed"){
+        $this->newInterest();
+   }
 
         return view('livewire.loans.assessment');
     }
