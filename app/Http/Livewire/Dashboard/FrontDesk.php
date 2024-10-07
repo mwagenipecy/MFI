@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Jobs\CalculateArrearsPenaltiesJob;
 use PDF;
+use Illuminate\Http\Request;
 
 class FrontDesk extends Component
 {
@@ -34,7 +35,7 @@ class FrontDesk extends Component
     public $member1;
     public $LoanPhoneNo;
     public $mob_number;
-    public $selectedMemberId;
+    public $selectedMemberId = null;
     public $accountSelected1;
     public $item;
 
@@ -61,7 +62,11 @@ class FrontDesk extends Component
     public $loan_product;
     public $start_date;
     public   $end_date;
-
+    public $maxPrinciple;
+    public $minPrinciple;
+    public $search;
+    public $members;
+    public $showDropdown = false; 
 
     // money withdraw
     public $payment_method;
@@ -88,6 +93,51 @@ class FrontDesk extends Component
     protected $rules=['payment_type'=>'required', 'memberNumber1'=>'required','amount'=>'required','reference_number'=>'required_if:payment_type,BANK','bank'=>'required_if:payment_type,BANK'];
 
 
+    public function mount()
+    {
+        $this->members = DB::table('members')->get();
+        $this->updatePrincipleLimits();
+    }
+
+    public function updatedSearch()
+    {
+        // Filter members based on search query
+        $this->members = DB::table('members')
+            ->where('first_name', 'like', '%' . $this->search . '%')
+            ->orWhere('middle_name', 'like', '%' . $this->search . '%')
+            ->orWhere('last_name', 'like', '%' . $this->search . '%')
+            ->get();
+    }
+
+    public function selectMember($memberId)
+    {
+        $this->selectedMemberId = $memberId;
+
+        // Optional: Set the selected member's name in the search input
+        $selectedMember = DB::table('members')->find($memberId);
+        $this->search = $selectedMember->first_name . ' ' . $selectedMember->middle_name . ' ' . $selectedMember->last_name;
+
+        // Clear the dropdown options after selecting
+        $this->showDropdown = false;
+    }
+    
+    public function showAllMembers()
+    {
+        $this->showDropdown = true;
+        $this->members = DB::table('members')->get();
+    }
+
+    public function updatedLoanProduct()
+    {
+        $this->updatePrincipleLimits();
+    }
+    
+    private function updatePrincipleLimits()
+    {
+        // Retrieve the max and min principle values based on the loan product
+        $this->maxPrinciple = DB::table('loan_sub_products')->where('sub_product_id', $this->loan_product)->value('principle_max_value');
+        $this->minPrinciple = DB::table('loan_sub_products')->where('sub_product_id', $this->loan_product)->value('principle_min_value');
+    }
     public function calculatePenalties()
     {
         try {
@@ -103,6 +153,10 @@ class FrontDesk extends Component
         }
     }
 
+    public function formatNumber($value)
+    {
+        return number_format($value, 0, '.', ',');
+    }
 
 
     public function downloadPDFFile(){
@@ -472,10 +526,35 @@ class FrontDesk extends Component
     }
 
 
-    public function process1()
+    public function process1(Request $request)
     {
+        
+        // Update the principle limits before validation
+        $this->updatePrincipleLimits();
+      
         // Register full name in member table
         $this->amount2 = $this->removeNumberFormat($this->amount2);
+        $this->validate([
+            'amount2' => [
+                'required',
+                // 'numeric',
+                function ($attribute, $value, $fail) {
+                    if ($value > $this->maxPrinciple) {
+                        $fail('The amount must not exceed ' . number_format($this->maxPrinciple) . ' TZS.');
+                    }
+
+                    if ($value < $this->minPrinciple) {
+                        $fail('The amount must be at least ' . number_format($this->minPrinciple) . ' TZS.');
+                    }
+                },
+            ],
+            'loan_officer' => 'required',
+            'pay_method' => 'required',
+            'loan_product' => 'required',
+        ], [
+            'amount2.required' => 'The amount field is required.'
+        ]);
+ 
 
         // Check if user exists by selected member ID
         $check_user = DB::table('members')->where('id', $this->selectedMemberId)->exists();

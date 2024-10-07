@@ -538,12 +538,44 @@
 
                         <p for="member_id" class="block mb-2 text-sm font-medium text-slate-600 dark:text-gray-400">
                             Select Member</p>
-                        <select id="member_id" name="member_id" class="w-full border-gray-300 focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 p-2.5 rounded-md shadow-sm text-sm" wire:model="selectedMemberId">
+                            <div class="relative w-full" x-data="{ showDropdown: @entangle('showDropdown') }" @click.away="showDropdown = false">
+                            <!-- Search Input -->
+                            <input 
+                                type="text" 
+                                wire:model="search" 
+                                wire:focus="showAllMembers"
+                                class="w-full p-2.5 border-gray-300 focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 rounded-md shadow-sm text-sm" 
+                                placeholder="Search Member..." 
+                                autocomplete="off"
+                                value="{{ $selectedMemberId }}"
+                            >
+
+                            <!-- Dropdown Options -->
+                             <div x-show="showDropdown">
+                                @if($showDropdown && count($members) > 0)
+                                    <ul class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-md max-h-60 overflow-auto">
+                                        @foreach($members as $member)
+                                            <li 
+                                                wire:click="selectMember('{{ $member->id }}')" 
+                                                class="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                                            >
+                                                {{ $member->first_name }} {{ $member->middle_name }} {{ $member->last_name }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                             </div>
+                           
+
+                            <!-- Hidden Select Field for Form Submission -->
+                            <input type="hidden" name="member_id" wire:model="selectedMemberId">
+                        </div>    
+                        <!-- <select id="member_id" name="member_id" class="w-full border-gray-300 focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 p-2.5 rounded-md shadow-sm text-sm" wire:model="selectedMemberId">
                             <option value="">Select Member</option>
                             @foreach(DB::table('members')->get() as $member)
                                 <option value="{{ $member->id }}">{{ $member->first_name }} {{ $member->middle_name }} {{ $member->last_name }}</option>
                             @endforeach
-                        </select>
+                        </select> -->
                         @error('selectedMemberId')
                         <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
                             <p>{{ $message }}</p>
@@ -586,17 +618,33 @@
                         @if($this->loan_product)
                             <p for="amount2" class="block mb-2 text-sm font-medium text-slate-600 dark:text-gray-400">
                                 Amount </p>
-                            <x-jet-input id="amount2" type="text" name="amount2" class="w-full border-gray-300 focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 p-2.5 rounded-md shadow-sm text-sm" wire:model.debounce.500ms="amount2" autofocus placeholder="{{'max '.number_format(DB::table('loan_sub_products')->where('sub_product_id',$this->loan_product)->value('principle_max_value')).'TZS min-value '.number_format(DB::table('loan_sub_products')->where('sub_product_id',$this->loan_product)->value('principle_min_value')).'TZS'}}"/>
+                            <!-- <x-jet-input id="amount2" type="text" name="amount2" class="w-full border-gray-300 focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 p-2.5 rounded-md shadow-sm text-sm" wire:model.debounce.500ms="amount2" autofocus 
+                             placeholder="{{'max '.number_format(DB::table('loan_sub_products')->where('sub_product_id',$this->loan_product)->value('principle_max_value')).'TZS min-value '.number_format(DB::table('loan_sub_products')->where('sub_product_id',$this->loan_product)->value('principle_min_value')).'TZS'}}"/> -->
+                            <x-jet-input 
+                                id="amount2" 
+                                type="text" 
+                                name="amount2" 
+                                class="w-full border-gray-300 focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 p-2.5 rounded-md shadow-sm text-sm" 
+                                wire:model.debounce.500ms="amount2" 
+                                autofocus 
+                                placeholder="{{ 'max '.number_format($this->maxPrinciple).' TZS min-value '.number_format($this->minPrinciple).' TZS' }}"
+                            />
+
                             @error('amount2')
+                            <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
+                                <p>{{ $message }}</p>
+                            </div>
+                            @enderror
+                            <!-- @error('amount2')
                             <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
                                 <p>Amount is mandatory</p>
                             </div>
-                            @enderror
+                            @enderror -->
                             <div class="mt-2"></div>
                         @endif
 
                         <p for="pay_method" class="block mb-2 text-sm font-medium text-slate-600 dark:text-gray-400">
-                            Payment Method. </p>
+                            Disbursment. </p>
                         <select wire:model.bounce="pay_method" name="pay_method" id="pay_type" class="w-full border-gray-300 focus:border-red-500 focus:ring rounded-lg focus:ring-red-200 focus:ring-opacity-50 p-2.5 rounded-md shadow-sm text-sm">
                             <option selected value="">Select</option>
                             <option value="CASH">CASH</option>
@@ -605,7 +653,7 @@
                         </select>
                         @error('pay_method')
                         <div class="border border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700 mt-1">
-                            <p>Payment method is mandatory</p>
+                            <p>Disbursment is mandatory</p>
                         </div>
                         @enderror
                         <div class="mt-2"></div>
@@ -1221,8 +1269,7 @@
 {{--            @endif--}}
         </div>
     </div>
-
-
+    <script src="//unpkg.com/alpinejs" defer></script>
     <script>
         $(function() {
             $('input[name="daterange"]').daterangepicker({

@@ -1,6 +1,7 @@
 <?php
 
 namespace Laravel\Fortify\Http\Requests;
+use Illuminate\Http\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Laravel\Fortify\Fortify;

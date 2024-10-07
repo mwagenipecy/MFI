@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::get('rest-api',[\App\Http\Controllers\Livewire\Loans\CreditInfo::class,'creditInforResponse']);
+Route::get('rest-api',[\App\Http\Livewire\Loans\CreditInfo::class,'creditInforResponse']);
 Route::post('institution-product-info',[\App\Http\Controllers\InstitutionInformationApi::class,'getInstitution'])->name('institution-info');
 Route::post('bank_funds_transfer_request',[\App\Http\Controllers\InstitutionInformationApi::class,'internalBankTransfer'])->name('institution-request');
 //Route::get('bank_funds_transfer_request', function (){
