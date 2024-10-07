@@ -18,6 +18,7 @@
 
             <div class="mt-2"></div>
 
+            <hr class="boder-b-0 my-6"/>
 
 
             <div class="flex w-full space-x-4">
@@ -102,6 +103,43 @@
             </div>
 
             <div class="mt-2"></div>
+
+
+            <hr class="boder-b-0 my-6"/>
+            <p for="collateral_type" class="block mt-6 text-sm font-bold @if($this->recommended) text-red-400 dark:text-red-400  @else text-red-400 dark:text-red-400 @endif "> Charges   </p>
+            <div class="w-full @if($this->recommended) bg-red-200  @else bg-blue-200 @endif   rounded rounded-lg shadow-sm   p-1 " >
+                <div class="w-full bg-white rounded rounded-lg shadow-sm   p-2 " >
+                    <table class="w-full">
+
+                        @foreach (DB::table('charges')->where('product_id',$this->loan_sub_product)->get() as $charge )
+
+
+                        <tr>
+                            <td class="text-xs text-slate-400 dark:text-white capitalize  text-left">
+                            <p>
+                                 <input checked id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            </p>
+                            </td>
+
+                            <td class="text-xs text-slate-400 dark:text-white capitalize  text-left">
+                                <p>  {{ $charge->charge_name }} </p>
+                            </td>
+                            <td class="text-xs text-slate-400 dark:text-white text-right">
+                                @if($charge->percentage_charge_amount==null)
+                                <p> {{number_format($charge->flat_charge_amount,2)}} TZS</p>
+                                @else
+
+                                <p> {{number_format($charge->percentage_charge_amount * $this->principle /100 ,2)}} TZS</p>
+
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+
+                    </table>
+                </div>
+            </div>
+
 
 
             <hr class="boder-b-0 my-6"/>
