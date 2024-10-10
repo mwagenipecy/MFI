@@ -286,17 +286,10 @@
                                     </div>
                                     <!-- Icon -->
                                     <div class="flex shrink-0 ml-2 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-
                                     </div>
                                 </div>
-
-
                             </li>
-
                        @endforeach
-
-
-
                     </ul>
                 </div>
 
