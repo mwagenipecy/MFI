@@ -19,7 +19,7 @@ class Assessment extends Component
 {
     use WithFileUploads;
 
-    public $photo;
+    public $photo,$approve_boolean=false;
     public $futureInterest = false;
     public $collateral_type, $collateral_description, $daily_sales, $loan, $collateral_value, $loan_sub_product;
     public $tenure = 0;
@@ -39,7 +39,7 @@ class Assessment extends Component
         public $recommended_tenure, $recommended_installment;
         public $recommended = true;
     public $business_age, $bank1 = 123456, $available_funds;
-    public $interest_method, $future_interests, $futureInsteresAmount, $valueAmmount, $net_profit, $status, $products;
+    public $interest_method,$set_id, $title, $future_interests, $futureInsteresAmount, $valueAmmount, $net_profit, $status, $products;
 
     protected $listeners = ['refreshAssessment' => '$refresh'];
 
@@ -53,6 +53,18 @@ class Assessment extends Component
         //$this->generateSchedule((double)$this->principle, (double)$this->interest, (double)$this->tenure);
     }
 
+    public function setActionId($id){
+        $this->set_id=$id;
+        switch($id){
+            case 4 :$this->title="Approve"; break;
+            case 5 :$this->title="Reject"; break;
+
+            case 3 :$this->title="Commit"; break;
+
+        }
+        $this->approve_boolean=!$this->approve_boolean;
+
+    }
     public function actionBtns($x)
     {
         //dd($x);
@@ -68,9 +80,6 @@ class Assessment extends Component
         }
         if ($x == 4) {
             $this->approve();
-
-
-
         }
         if ($x == 5) {
             $this->reject();
@@ -92,6 +101,89 @@ class Assessment extends Component
             $this->closeLoan();
         }
     }
+
+
+    public $return_boolean=false;
+    public $comment;
+    public $comment_id;
+    function returnModal(){
+
+   $this->return_boolean= !$this->return_boolean;
+    $this->title="Return ";
+    }
+
+    public  function replyComment($id){
+
+      $this->comment_id= $id;
+      $this->return_boolean= !$this->return_boolean;
+
+    }
+
+
+    function returnBack(){
+        $this->validate(['comment'=>'required']);
+
+        LoansModel::where('id',Session::get('currentloanID'))
+         ->update(['status'=>'ONPROGRESS']);
+
+         DB::table('loan_comments')->insert([
+
+            'user_id'=>auth()->user()->id,
+            'loan_id'=>Session::get('currentloanID'),
+            'comment'=>$this->comment,
+            'parent_id'=>$this->comment_id ? :0
+
+         ]);
+
+         //new table comments
+         $this->return_boolean=false;
+
+         if($this->comment_id){
+
+         }else{
+            Session::put('currentloanID',null);
+            Session::put('currentloanClient',null);
+            $this->emit('currentloanID');
+         }
+
+
+
+    }
+
+    public function storeCharge($charge_id)
+    {
+        if( DB::table('loan_has_charges')->where('loan_id',session('currentloanID'))->where('charge_id',$charge_id)->exists()){
+
+            DB::table('loan_has_charges')->where('loan_id',session('currentloanID'))->where('charge_id',$charge_id)->delete();
+        }else{
+
+            $charge=DB::table('charges')->where('id',$charge_id)->first();
+
+            $amount=0;
+         if( $charge->percentage_charge_amount==null){
+            $amount=$charge->flat_charge_amount;
+         }else{
+
+            $amount=$charge->percentage_charge_amount * $this->principle /100 ;
+         }
+
+            DB::table('loan_has_charges')->insert([
+                'charge_id' => $charge_id,
+                'loan_id' => Session::get('currentloanID'),
+                'amount' =>  $amount,
+
+            ]);
+
+        }
+
+
+
+
+        // $this->dispatchBrowserEvent('chargeStored', ['charge_id' => $charge_id]);
+    }
+
+
+
 
     public function receiveData(){
 
@@ -136,7 +228,12 @@ class Assessment extends Component
 
         $amount=$this->principle;
         $interest_amount=$this->interest_amount;
-        $this->interest= ($interest_amount/$amount)* 100;
+        if( ($interest_amount/$amount)* 100 ==0){
+            // $this->interest= $this->interest;
+        }else{
+            $this->interest=  ($interest_amount/$amount)* 100 ;
+        }
+
 
     }
 

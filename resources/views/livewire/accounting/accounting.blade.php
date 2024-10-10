@@ -1,6 +1,15 @@
 
 
 <div>
+
+    <style>
+
+        .bg-parent {
+          background-color:#C52D28;
+         }
+       </style>
+
+
     <div class="p-2">
         <!-- Welcome banner -->
         <div class="relative p-4 mb-2 overflow-hidden rounded-lg bg-white" >
@@ -12,12 +21,12 @@
                         <path id="welcome-e" d="M40 0l40 80-40-12.5L0 80z" />
                         <path id="welcome-g" d="M40 0l40 80-40-12.5L0 80z" />
                         <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="welcome-b">
-                            <stop stop-color="#2D3D88" offset="0%" /> <!-- Dark Blue -->
-                            <stop stop-color="#2D3D88" offset="100%" /> <!-- Light Blue -->
+                            <stop stop-color="#C52D28" offset="0%" /> <!-- Dark Blue -->
+                            <stop stop-color="#C52D28" offset="100%" /> <!-- Light Blue -->
                         </linearGradient>
                         <linearGradient x1="50%" y1="24.537%" x2="50%" y2="100%" id="welcome-c">
-                            <stop stop-color="#2D3D88" offset="0%" /> <!-- Light Blue -->
-                            <stop stop-color="#2D3D88" stop-opacity="0" offset="100%" /> <!-- Dark Blue -->
+                            <stop stop-color="#C52D28" offset="0%" /> <!-- Light Blue -->
+                            <stop stop-color="#C52D28" stop-opacity="0" offset="100%" /> <!-- Dark Blue -->
                         </linearGradient>
                     </defs>
                     <g fill="none" fill-rule="evenodd">
@@ -101,19 +110,23 @@
                         ['id' => 5, 'label' => 'Trail Balance'],
                         ['id' => 9, 'label' => 'Members'],
                         ['id' => 13, 'label' => 'Expenses'],
+                        ['id' => 14, 'label' => 'Disbursement Report '],
+
                     ];
                 @endphp
 
 
                 @foreach ($menuItems as $menuItem)
+
+
                     <button
                             wire:click="menuItemClicked({{ $menuItem['id'] }})"
                             class="flex hover:text-white text-center items-center w-full
-            @if ($this->tab_id == $menuItem['id']) bg-blue-900 @else bg-gray-100 @endif
+            @if ($this->tab_id == $menuItem['id']) bg-parent @else bg-gray-100 @endif
                             @if ($this->tab_id == $menuItem['id']) text-white font-bold @else text-gray-400 font-semibold @endif
                                     py-2 px-4 rounded-lg"
 
-                            onmouseover="this.style.backgroundColor='#2D3D88'; this.style.color='white';"
+                            onmouseover="this.style.backgroundColor='#C52D28'; this.style.color='white';"
                             onmouseout="this.style.backgroundColor=''; this.style.color='';"
                     >
 
@@ -206,6 +219,13 @@
             @if($this->tab_id == 12 )
                 <livewire:accounting.g-l-statement/>
             @endif
+
+        @if($this->tab_id == 14 )
+            <livewire:accounting.disbursement/>
+        @endif
+
+
+
 
         </div>
 

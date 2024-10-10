@@ -25,7 +25,22 @@ class LoansDisbursement extends Component
         $this->viewMemberDetail=false;
         Session::put('currentloanID',null);
         Session::put('currentloanMember',null);
+        session()->forget('loan_id');
+        session()->forget('reject_loan');
+
+
     }
+
+    public function approve(){
+        $this->emit('approve');
+    }
+
+
+    public function reject(){
+        $this->emit('reject');
+
+    }
+
 
 
     public function memberDetails(){

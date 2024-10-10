@@ -586,6 +586,7 @@ class Accounting extends Component
     {
         $this->activeAccountsCount = AccountsModel::where('account_status', 'Active')->count();
         $this->inactiveAccountsCount = AccountsModel::where('account_status', 'Pending')->count();
+        session()->forget('loan_id');
         $this->AccountsList = AccountsModel::get();
         return view('livewire.accounting.accounting');
     }

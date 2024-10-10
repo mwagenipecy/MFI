@@ -8,6 +8,8 @@ use App\Models\loans_schedules;
 use App\Models\loans_summary;
 use App\Models\LoansModel;
 use App\Models\ClientsModel;
+use App\Services\Loan\CreditService;
+use App\Services\Loan\DebitService;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Config;
@@ -75,6 +77,8 @@ class LoansTable extends LivewireDatatable
     public $bank1="921673621";
     public  $available_funds;
 
+    protected $listeners=["approve"=>"confirmApprove","reject"=>"ConfirmReject"];
+
 
 
 
@@ -104,9 +108,9 @@ class LoansTable extends LivewireDatatable
     {
         return [
 
-            Column::callback(['client_number'], function ($member_number) {
+            Column::callback(['member_id'], function ($member_number) {
 
-                return ClientsModel::where('client_number',$member_number)->value('first_name').' '.ClientsModel::where('client_number',$member_number)->value('middle_name').' '.ClientsModel::where('client_number',$member_number)->value('last_name');
+                return ClientsModel::where('id',$member_number)->value('first_name').' '.ClientsModel::where('id',$member_number)->value('middle_name').' '.ClientsModel::where('id',$member_number)->value('last_name');
             })->label('Member name'),
 
             Column::callback(['guarantor'], function ($guarantor) {
@@ -143,7 +147,16 @@ class LoansTable extends LivewireDatatable
     }
 
 
-    public function reject($id){
+    public function reject($id): void{
+
+        session()->put('reject_loan',$id);
+        $this->emit('currentloanID');
+    }
+
+
+    public function ConfirmReject(): void{
+
+        $id=session('reject_loan');
         LoansModel::where('id',$id)->update([
             'status'=> 'REJECTED'
         ]);
@@ -153,12 +166,20 @@ class LoansTable extends LivewireDatatable
 
         Session::put('currentloanID',null);
         Session::put('currentloanMember',null);
+        session()->forget('loan_id');
+        session()->forget('reject_loan');
         $this->emit('currentloanID');
     }
 
 
-
     public function approve($id){
+        session()->put('loan_id',$id);
+        $this->emit('currentloanID');
+    }
+
+    public function confirmApprove(){
+
+        $id=session('loan_id');
         $this->loadData($id);
 
         LoansModel::where('id', $id)->update([
@@ -200,11 +221,17 @@ class LoansTable extends LivewireDatatable
         }
 
         $this->processPayment();
+
+
         Session::flash('loan_commit', 'The loan has been Approved!');
         Session::flash('alert-class', 'alert-success');
         Session::put('currentloanID',null);
         Session::put('currentloanMember',null);
+        session()->forget('loan_id');
+        session()->forget('reject_loan');
+
         $this->emit('currentloanID');
+
     }
 
 
@@ -217,130 +244,42 @@ class LoansTable extends LivewireDatatable
         $institution_id = '';
         $id = auth()->user()->id;
 
-        $mirror_account = AccountsModel::where('account_number', $this->bank1)->value('mirror_account');
+        $loan_id=session('loan_id');
 
-        $savings_account_new_balance = (double)AccountsModel::where('account_number', $this->loan_account_number)->value('balance') + (double)$this->principle;
+        $loan=DB::table('loans')->where('id',$loan_id)->first();
+        $loan_product = DB::table('loan_sub_products')->where('sub_product_id',$loan->loan_sub_product)->first();
 
-        $savings_ledger_account_new_balance = (double)AccountsModel::where('account_number', $mirror_account)->value('balance') - (double)$this->principle;
+        $disbursement_account=DB::table('accounts')->where('id',$loan_product->disbursement_account)->value('account_number');
 
-        $partner_bank_account_new_balance = (double)AccountsModel::where('account_number', $this->bank1)->value('balance') + (double)$this->principle;
-
-        AccountsModel::where('account_number', $this->loan_account_number)->update(['balance' => $savings_account_new_balance]);
-        AccountsModel::where('account_number', $mirror_account)->update(['balance' => $savings_ledger_account_new_balance]);
-        AccountsModel::where('account_number', $this->bank1)->update(['balance' => $partner_bank_account_new_balance]);
-
-        $reference_number = time();
+        $source_account=DB::table('accounts')->where('id',$loan_product->collection_account_loan_principle)->value('account_number');
 
 
+        $credit = new CreditService();
+        $outPut1= $credit->makeTransaction($source_account, (double)$this->principle, $this->loan_account_number, "loan Disbursement to $this->loan_account_number");
 
-        //DEBIT RECORD MEMBER
-        general_ledger::create([
-            'record_on_account_number' => $this->loan_account_number,
-            'record_on_account_number_balance' => $savings_account_new_balance,
-            'sender_branch_id' =>1,
-            'beneficiary_branch_id' => 1,
-           // 'sender_product_id' => AccountsModel::where('account_number', $mirror_account)->value('product_number'),
-            //'sender_sub_product_id' => AccountsModel::where('account_number', $mirror_account)->value('sub_product_number'),
-           // 'beneficiary_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('product_number'),
-            'beneficiary_sub_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('sub_product_number'),
-            'sender_id' => '999999',
-            'beneficiary_id' => $this->member_number,
-            'sender_name' => 'Organization',
-            'beneficiary_name' => ClientsModel::where('client_number', $this->member_number)->value('first_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('middle_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('last_name'),
-            'sender_account_number' => $mirror_account,
-            'beneficiary_account_number' => $this->loan_account_number,
-            'transaction_type' => 'IFT',
-            'sender_account_currency_type' => 'TZS',
-            'beneficiary_account_currency_type' => 'TZS',
-            'narration' => 'Loan disbursement',
-            'credit' => (double)$this->principle,
-            'debit' => 0,
-            'reference_number' => $reference_number,
-            'trans_status' => 'Successful',
-            'trans_status_description' => 'Successful',
-            'swift_code' => '',
-            'destination_bank_name' => '',
-            'destination_bank_number' => '',
-            'payment_status' => 'Successful',
-            'recon_status' => 'Pending',
-            'partner_bank' => AccountsModel::where('account_number', $this->bank1)->value('institution_number'),
-            'partner_bank_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
-            'partner_bank_account_number' => $this->bank1,
-            'partner_bank_transaction_reference_number' => $reference_number,
 
-        ]);
+        $outPut2= $credit->makeTransaction($source_account, (double)$this->principle, $disbursement_account, "loan Disbursement to $disbursement_account");
 
-        //CREDIT RECORD SHARE ACCOUNT
-        general_ledger::create([
-            'record_on_account_number' => $this->bank1,
-            'record_on_account_number_balance' => $partner_bank_account_new_balance,
-            'sender_branch_id' => 1,
-            'beneficiary_branch_id' => 1,
-           // 'sender_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('product_number'),
-            //'sender_sub_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('sub_product_number'),
-            //'beneficiary_product_id' => AccountsModel::where('account_number', $this->bank1)->value('product_number'),
-            //'beneficiary_sub_product_id' => AccountsModel::where('account_number', $this->bank1)->value('sub_product_number'),
-            'sender_id' => $this->member_number,
-            'beneficiary_id' => AccountsModel::where('account_number', $this->bank1)->value('institution_number'),
-            'sender_name' => ClientsModel::where('client_number', $this->member_number)->value('first_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('middle_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('last_name'),
-            'beneficiary_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
-            'sender_account_number' => $this->loan_account_number,
-            'beneficiary_account_number' => $this->bank1,
-            'transaction_type' => 'IFT',
-            'sender_account_currency_type' => 'TZS',
-            'beneficiary_account_currency_type' => 'TZS',
-            'narration' => 'Loan Disbursement',
-            'credit' => (double)$this->principle,
-            'debit' => 0,
-            'reference_number' => $reference_number,
-            'trans_status' => 'Successful',
-            'trans_status_description' => 'Successful',
-            'swift_code' => '',
-            'destination_bank_name' => '',
-            'destination_bank_number' => '',
-            'payment_status' => 'Successful',
-            'recon_status' => 'Pending',
-            'partner_bank' => AccountsModel::where('account_number', $this->bank1)->value('institution_number'),
-            'partner_bank_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
-            'partner_bank_account_number' => $this->bank1,
-            'partner_bank_transaction_reference_number' => $reference_number,
-        ]);
 
-        //CREDIT RECORD GL
-        general_ledger::create([
-            'record_on_account_number' => $mirror_account,
-            'record_on_account_number_balance' => $savings_ledger_account_new_balance,
-            'sender_branch_id' => 1,
-            'beneficiary_branch_id' => 1,
-           // 'sender_product_id' => AccountsModel::where('account_number', $mirror_account)->value('product_number'),
-            //'sender_sub_product_id' => AccountsModel::where('account_number', $mirror_account)->value('sub_product_number'),
-           // 'beneficiary_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('product_number'),
-            //'beneficiary_sub_product_id' => AccountsModel::where('account_number', $this->loan_account_number)->value('sub_product_number'),
-            'sender_id' => '999999',
-            'beneficiary_id' => $this->loan_account_number,
-            'sender_name' => AccountsModel::where('account_number', $mirror_account)->value('account_name'),
-            'beneficiary_name' => ClientsModel::where('client_number', $this->member_number)->value('first_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('middle_name') . ' ' . ClientsModel::where('client_number', $this->member_number)->value('last_name'),
-            'sender_account_number' => $mirror_account,
-            'beneficiary_account_number' => $this->loan_account_number,
-            'transaction_type' => 'IFT',
-            'sender_account_currency_type' => 'TZS',
-            'beneficiary_account_currency_type' => 'TZS',
-            'narration' => 'Loan Disbursement',
-            'credit' => 0,
-            'debit' => (double)$this->principle,
-            'reference_number' => $reference_number,
-            'trans_status' => 'Successful',
-            'trans_status_description' => 'Successful',
-            'swift_code' => '',
-            'destination_bank_name' => '',
-            'destination_bank_number' => '',
-            'payment_status' => 'Successful',
-            'recon_status' => 'Pending',
-            'partner_bank' => AccountsModel::where('account_number', $this->bank1)->value('institution_number'),
-            'partner_bank_name' => AccountsModel::where('account_number', $this->bank1)->value('account_name'),
-            'partner_bank_account_number' => $this->bank1,
-            'partner_bank_transaction_reference_number' => $reference_number,
-        ]);
+        $debit = new DebitService ();
+        $outPut3= $debit->makeTransaction($source_account, (double)$this->principle, $this->loan_account_number, "loan Disbursement to $disbursement_account");
+
+
+       // dd($outPut1,  $outPut2, $outPut1 );
+
+        // $mirror_account = AccountsModel::where('account_number', $this->bank1)->value('mirror_account');
+
+        // $savings_account_new_balance = (double)AccountsModel::where('account_number', $this->loan_account_number)->value('balance') + (double)$this->principle;
+
+        // $savings_ledger_account_new_balance = (double)AccountsModel::where('account_number', $mirror_account)->value('balance') - (double)$this->principle;
+
+        // $partner_bank_account_new_balance = (double)AccountsModel::where('account_number', $this->bank1)->value('balance') + (double)$this->principle;
+
+        // AccountsModel::where('account_number', $this->loan_account_number)->update(['balance' => $savings_account_new_balance]);
+        // AccountsModel::where('account_number', $mirror_account)->update(['balance' => $savings_ledger_account_new_balance]);
+        // AccountsModel::where('account_number', $this->bank1)->update(['balance' => $partner_bank_account_new_balance]);
+
+        // $reference_number = time();
 
 
 

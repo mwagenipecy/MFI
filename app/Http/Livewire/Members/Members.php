@@ -451,9 +451,9 @@ class Members extends Component
             'updated_at' => now(),
             'account_number' => $this->account_number,
             'institution_id' => $this->institution_id,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
+            'first_name' =>  $this->capitalizeFirstLetter($this->first_name),
+            'middle_name' =>  $this->capitalizeFirstLetter($this->middle_name),
+            'last_name' => $this->capitalizeFirstLetter($this->last_name),
             'branch' => $this->branch,
             'registering_officer' => $this->registering_officer,
             'loan_officer' => $this->loan_officer,
@@ -471,20 +471,20 @@ class Members extends Component
             'current_team_id' => $this->current_team_id,
             'profile_photo_path' => $this->profile_photo_path,
             'branch_id' => $this->branch_id,
-            'next_of_kin_name' => $this->next_of_kin_name,
+            'next_of_kin_name' => $this->capitalizeFirstLetter($this->next_of_kin_name),
             'next_of_kin_phone' => $this->next_of_kin_phone,
             'next_of_kin_relationship' => $this->next_of_kin_relationship,
             'tin_number' => $this->tin_number,
             'nida_number' => $this->nida_number,
             'ref_number' => $this->ref_number,
             'shares_ref_number' => $this->shares_ref_number,
-            'nationarity' => $this->nationarity,
+            'nationarity' => $this->capitalizeFirstLetter( $this->nationarity ),
             'member_exit_document' => $this->member_exit_document,
             'end_membership_description' => $this->end_membership_description,
             'amount' => $this->amount,
             'national_id' => $this->national_id,
             'customer_code' => $this->customer_code,
-            'present_surname' => $this->present_surname,
+            'present_surname' => $this->capitalizeFirstLetter($this->present_surname),
             'birth_surname' => $this->birth_surname,
             'number_of_spouse' => $this->number_of_spouse,
             'number_of_children' => $this->number_of_children,
@@ -513,12 +513,12 @@ class Members extends Component
             'custom_id_number_1' => $this->custom_id_number_1,
             'custom_id_number_2' => $this->custom_id_number_2,
             'main_address' => $this->main_address,
-            'ward' => $this->ward,
+            'ward' => $this->capitalizeFirstLetter( $this->ward ),
             'number_of_building' => $this->number_of_building,
             'postal_code' => $this->postal_code,
-            'region' => $this->region,
-            'district' => $this->district,
-            'country' => $this->country,
+            'region' =>$this->capitalizeFirstLetter( $this->region ),
+            'district' =>$this->capitalizeFirstLetter($this->district),
+            'country' => $this->capitalizeFirstLetter($this->country),
             'mobile_phone' => $this->mobile_phone,
             'fixed_line' => $this->fixed_line,
             'web_page' => $this->web_page,
@@ -630,14 +630,17 @@ class Members extends Component
 
 
 
+
+
+
             // Create a new member
             $id = MembersModel::create([
                 'account_number' => $this->account_number,
                 'member_savings_account' => $idy,
                 'institution_id' => $this->institution_id,
-                'first_name' => $this->first_name,
-                'middle_name' => $this->middle_name,
-                'last_name' => $this->last_name,
+                'first_name' =>  $this->capitalizeFirstLetter($this->first_name),
+                'middle_name' =>  $this->capitalizeFirstLetter($this->middle_name),
+                'last_name' => $this->capitalizeFirstLetter($this->last_name),
                 'branch' => $this->branch,
                 'registering_officer' => $this->registering_officer,
                 'loan_officer' => $this->loan_officer,
@@ -698,12 +701,12 @@ class Members extends Component
                 'custom_id_number_1' => $this->custom_id_number_1,
                 'custom_id_number_2' => $this->custom_id_number_2,
                 'main_address' => $this->main_address,
-                'ward' => $this->ward,
+                'region' =>$this->capitalizeFirstLetter( $this->region ),
+                'district' =>$this->capitalizeFirstLetter($this->district),
+                'country' => $this->capitalizeFirstLetter($this->country),
+                'ward' =>$this->capitalizeFirstLetter( $this->ward),
                 'number_of_building' => $this->number_of_building,
                 'postal_code' => $this->postal_code,
-                'region' => $this->region,
-                'district' => $this->district,
-                'country' => $this->country,
                 'mobile_phone' => $this->mobile_phone,
                 'fixed_line' => $this->fixed_line,
                 'web_page' => $this->web_page,
@@ -746,6 +749,13 @@ class Members extends Component
 //        }
     }
 
+
+
+    public function capitalizeFirstLetter($string) {
+        $string = strtolower($string);
+        $string = ucfirst($string);
+        return $string;
+    }
 
     public function sendApproval($id,$msg,$code,$processName){
 

@@ -66,7 +66,7 @@ class FrontDesk extends Component
     public $minPrinciple;
     public $search;
     public $members;
-    public $showDropdown = false; 
+    public $showDropdown = false;
 
     // money withdraw
     public $payment_method;
@@ -120,7 +120,7 @@ class FrontDesk extends Component
         // Clear the dropdown options after selecting
         $this->showDropdown = false;
     }
-    
+
     public function showAllMembers()
     {
         $this->showDropdown = true;
@@ -131,7 +131,7 @@ class FrontDesk extends Component
     {
         $this->updatePrincipleLimits();
     }
-    
+
     private function updatePrincipleLimits()
     {
         // Retrieve the max and min principle values based on the loan product
@@ -202,7 +202,6 @@ class FrontDesk extends Component
 
 
     public function process3(){
-
 
 
         $this->validate([
@@ -376,17 +375,10 @@ class FrontDesk extends Component
 
     public function process(){
 
-        //$this->update_repayment('1717051575', 30000);
-//        $this->update_repayment($this->accountSelected, 'amount');
-
 
         $this->validate();
-
         $this->amount=$this->removeNumberFormat($this->amount);
-
         if($this->payment_type=="CASH"){
-
-
             // get loan id of member
             $loanUser = LoansModel::where('loan_id',$this->accountSelected)->first();
 
@@ -528,10 +520,10 @@ class FrontDesk extends Component
 
     public function process1(Request $request)
     {
-        
+
         // Update the principle limits before validation
         $this->updatePrincipleLimits();
-      
+
         // Register full name in member table
         $this->amount2 = $this->removeNumberFormat($this->amount2);
         $this->validate([
@@ -554,7 +546,7 @@ class FrontDesk extends Component
         ], [
             'amount2.required' => 'The amount field is required.'
         ]);
- 
+
 
         // Check if user exists by selected member ID
         $check_user = DB::table('members')->where('id', $this->selectedMemberId)->exists();

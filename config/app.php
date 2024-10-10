@@ -69,8 +69,9 @@ return [
     | ahead and set this to a sensible default for you out of the box.
     |
     */
+    'timezone' => 'Africa/Dar_es_Salaam',
 
-    'timezone' => 'UTC',
+  ///  'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------

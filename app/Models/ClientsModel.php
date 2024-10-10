@@ -9,7 +9,7 @@ class ClientsModel extends Model
 {
     use HasFactory;
     use Search;
-    protected $table = 'clients';
+    protected $table = 'members';
     protected $guarded = [];
     protected $searchable = [
        'client_number', 'first_name',  'last_name', 'mobile_phone_number'
