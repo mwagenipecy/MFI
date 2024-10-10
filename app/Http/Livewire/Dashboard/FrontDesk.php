@@ -392,8 +392,6 @@ class FrontDesk extends Component
             // update
             AccountsModel::where('account_number', $customer_account_data->account_number)->update(['balance' => $new_customer_balance]);
 
-
-            
             // records on general ledger
             $records_on_general_ledger = new general_ledger();
             $records_on_general_ledger->credit($customer_account_data->account_number, $new_customer_balance, '0000', $this->amount, 'Cash payment', '');
