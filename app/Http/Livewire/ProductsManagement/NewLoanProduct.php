@@ -80,6 +80,7 @@ class NewLoanProduct extends Component
 
     public function mount($product_id){// make this dynamic
         $this->product_id = $product_id;
+        $this->sub_product_id = "104_" . rand(1000, 9999);
     }
 
 
@@ -160,7 +161,9 @@ class NewLoanProduct extends Component
          $this->validate();
 
         $idp = Loan_sub_products::create([
-            "sub_product_id" => "104_".rand(0000,9999),
+            // "sub_product_id" => "104_".rand(0000,9999),
+            "sub_product_id" => $this->sub_product_id,
+
             "sub_product_name" => $this->sub_product_name,
             "prefix" => $this->prefix,
             "sub_product_status" => $this->sub_product_status,
@@ -208,17 +211,21 @@ class NewLoanProduct extends Component
     }
 
     public function saveCharge(){
+
         $id = Charges::create([
 
             "institution_number" => '1001',
             "branch_number" => "101",
             "charge_number" => "101",
+            'product_id'=>$this->sub_product_id,
             "charge_name" => $this->charge_name,
             "charge_type" => $this->charge_type,
             "flat_charge_amount" => $this->charge_amount,
             "percentage_charge_amount" => $this->charge_percent,
 
         ])->id;
+
+
         $this->sendApproval1($id,'has edited loan product charges','14');
     }
 

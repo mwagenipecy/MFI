@@ -42,54 +42,56 @@ class DisbursementTable extends LivewireDatatable
                     return DB::table('members')->where('id',$member_number)->value('first_name').' '.DB::table('members')->where('id',$member_number)->value('middle_name').' '.DB::table('members')->where('id',$member_number)->value('last_name');
                 })->label('Member name'),
 
-                Column::name('principle')->label('Loan Amount'),
-                Column::callback(['id','principle','created_at'], function ($id ,$principle, $date) {
-                    $charger_ids=DB::table('loan_has_charges')->where('loan_id', $id)->pluck('charge_id')->toArray();
+                Column::callback('principle',function($amount){
+                    return number_format($amount,2);
+                })->label('Loan Amount'),
+                Column::callback(['id', 'principle', 'created_at'], function ($id, $principle, $date) {
 
-                        $charges=DB::table('charges')->whereIn('id',$charger_ids)->get();
+                    $charge_ids = DB::table('loan_has_charges')->where('loan_id', $id)->pluck('charge_id')->toArray();
 
-                        $amount=0;
+                    $charges = DB::table('charges')->whereIn('id', $charge_ids)->get();
 
-                        foreach($charges as $charge){
+                    $amount = 0;
 
-                            if( $charge->percentage_charge_amount==null){
-                                $amount=$charge->flat_charge_amount;
-                             }else{
-
-                                $amount=$charge->percentage_charge_amount * $principle /100 ;
-                             }
-
-                             $amount=$amount+$amount;
+                    foreach($charges as $charge) {
+                        if ($charge->percentage_charge_amount === null) {
+                            // Add flat charge
+                            $amount += $charge->flat_charge_amount;
+                        } else {
+                            // Calculate and add percentage charge based on the principle
+                            $amount += ($charge->percentage_charge_amount * $principle) / 100;
                         }
+                    }
 
-                    return number_format($amount);
-
+                    return number_format($amount, 2); // Format amount to 2 decimal places
                 })->label('Total Charges'),
 
+                Column::callback(['id', 'principle'], function ($id, $principle) {
 
-                Column::callback(['id','principle'], function ($id,$principle) {
+                    $charge_ids = DB::table('loan_has_charges')->where('loan_id', $id)->pluck('charge_id')->toArray();
 
-                    $charger_ids=DB::table('loan_has_charges')->where('loan_id', $id)->pluck('charge_id')->toArray();
+                    $charges = DB::table('charges')->whereIn('id', $charge_ids)->get();
 
-                        $charges=DB::table('charges')->whereIn('id',$charger_ids)->get();
+                    $total_charges = 0;
 
-                        $amount=0;
-
-                        foreach($charges as $charge){
-
-                            if( $charge->percentage_charge_amount==null){
-                                $amount=$charge->flat_charge_amount;
-                             }else{
-
-                                $amount=$charge->percentage_charge_amount * $principle /100 ;
-                             }
-
-                             $amount=$amount+$amount;
+                    foreach($charges as $charge) {
+                        if ($charge->percentage_charge_amount === null) {
+                            // Add flat charge
+                            $total_charges += $charge->flat_charge_amount;
+                        } else {
+                            // Calculate and add percentage charge based on the principle
+                            $total_charges += ($charge->percentage_charge_amount * $principle) / 100;
                         }
+                    }
 
-                    return number_format(($principle - $amount),2 );
+                    // Subtract total charges from principle to get amount payable
+                    $amount_payable = $principle - $total_charges;
 
+                    return number_format($amount_payable, 2); // Format to 2 decimal places
                 })->label('Amount Payable'),
+
+
+
                 Column::callback(['branch_id'], function ($branch_id) {
 
                     return BranchesModel::where('id',$branch_id)->value('name');

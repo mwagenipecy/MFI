@@ -62,21 +62,24 @@ class ContractData implements FromArray,WithHeadings, WithStyles, ShouldAutoSize
                 'TypeofContract'=>'Individual',
                 'PurposeofFinancing'=>Loan_sub_products::where('sub_product_id',$loanData->loan_sub_product)->value('sub_product_name'),
                 'InterestRate'=>$loanData->interest,
-                'TotalAmount'=>$loanData->principle,
-                'TotalTakenAmount'=>(double)$loanData->principle -(double)$loanData->total_principle-(double)$loanData->future_interest,
-                'InstallmentAmount'=>loans_schedules::where('loan_id',$loanData->loan_id)->sum('installment'),
+                'TotalAmount'=>number_format($loanData->principle,2),
+                'TotalTakenAmount'=>number_format(((double)$loanData->principle -(double)$loanData->total_principle-(double)$loanData->future_interest),2),
+                'InstallmentAmount'=>number_format(loans_schedules::where('loan_id',$loanData->loan_id)->sum('installment'),2 ),
                 'NumberofInstallments'=>loans_schedules::where('loan_id',$loanData->loan_id)->count(),
                 'NumberofOutstandingInstallments'=>(loans_schedules::where('loan_id',$loanData->loan_id)->count()) - (loans_schedules::where('loan_id',$loanData->loan_id) ->where('completion_status','CLOSED')->count()),
-                'OutstandingAmount'=>loans_schedules::where('loan_id',$loanData->loan_id) ->where('completion_status','CLOSED')->sum('installment'),
+                'OutstandingAmount'=>number_format(loans_schedules::where('loan_id',$loanData->loan_id)
+                ->where('completion_status','CLOSED')->sum('installment'),2),
                 'Past Due Amount'=>null,
                 'PastDueDays'=>$loanData->days_in_arrears,
                 'NumberOfDueInstallments'=>null,
-                'AdditionalFeesSum'=>loans_schedules::where('loan_id',$loanData->loan_id)->sum('penalties'),
-                'AdditionalFeesPaid'=>loans_schedules::where('loan_id',$loanData->loan_id)->where('completion_status','CLOSED')->sum('penalties'),
+                'AdditionalFeesSum'=>number_format(loans_schedules::
+                    where('loan_id',$loanData->loan_id)->sum('penalties')),
+                'AdditionalFeesPaid'=>number_format((loans_schedules::where('loan_id',$loanData->loan_id)->
+                where('completion_status','CLOSED')->sum('penalties')),2),
                 'DateofLastPayment'=>loans_schedules::where('loan_id',$loanData->loan_id)->where('completion_status','CLOSED')->max('updated_at'),
-                'TotalMonthlyPayment'=>loans_schedules::where('loan_id', $loanData->loan_id)
-                                            ->where('completion_status', 'CLOSED')
-                                            ->whereBetween('updated_at', [$startDate, $endDate])->sum('payment'),
+                'TotalMonthlyPayment'=>number_format( (loans_schedules::where('loan_id', $loanData->loan_id)
+                ->where('completion_status', 'CLOSED')
+                ->whereBetween('updated_at', [$startDate, $endDate])->sum('payment')),2),
                 'PaymentPeriodicity'=>null,
                 'CreditUsageinLast30Days'=>null,
                 'StartDate'=>loans_schedules::where('loan_id',$loanData->loan_id)->min('installment_date'),
@@ -84,7 +87,7 @@ class ContractData implements FromArray,WithHeadings, WithStyles, ShouldAutoSize
                 'RealEndDate'=>loans_schedules::where('loan_id',$loanData->loan_id)->max('installment_date') < loans_schedules::where('loan_id',$loanData->loan_id)->max('updated_at')  ? : null,
                 'NegativeStatusoftheContract'=>'constant',
                 'CollateralType'=>$loanData->collateral_type,
-                'CollateralValue'=>$loanData->collateral_value,
+                'CollateralValue'=>number_format($loanData->collateral_value,2),
                 'RoleofCustomer'=>null,
                 'CurrencyofContract'=>'TZS'
 

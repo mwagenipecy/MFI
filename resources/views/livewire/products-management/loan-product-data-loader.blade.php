@@ -465,7 +465,7 @@
                         </th>
                         <td class="py-1 px-0 sm:text-xs ">
                             @if($charge->charge_type == 'fixed')
-                                {{ $charge->flat_charge_amount }}
+                                {{ number_format($charge->flat_charge_amount ,2)}} TZS
                             @else
                                 {{ $charge->percentage_charge_amount }} %
                             @endif

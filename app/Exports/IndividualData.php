@@ -39,7 +39,7 @@ class IndividualData implements FromArray,WithHeadings, WithStyles, ShouldAutoSi
 
 
         foreach ($client_numbers as $number){
-               $clientData=ClientsModel::where('client_number',$number)->first();
+               $clientData=ClientsModel::where('id',$number)->first();
 
             $array[]=[
 
@@ -64,8 +64,8 @@ class IndividualData implements FromArray,WithHeadings, WithStyles, ShouldAutoSi
                 'EmployerName'=>$clientData->employer_name,
                 'Education'=>$clientData->education,
                 'BusinessName'=>$clientData->business_name,
-                'IncomeAvailable'=>$clientData->income_available,
-                'MonthlyExpenses'=>$clientData->monthly_expenses,
+                'IncomeAvailable'=>number_format($clientData->income_available,2),
+                'MonthlyExpenses'=>number_format($clientData->monthly_expenses,2),
                 'NegativeStatusofanIndividual'=>$clientData->negative_status_of_individual,
                 'TaxIdentificationNumber'=>$clientData->tax_identification_number,
                 'NationalID'=>$clientData->national_id,

@@ -107,6 +107,7 @@ class LoanProductDataLoader extends Component
 
             $this->sub_product_name= $sub_product->sub_product_name;
             $this->prefix= $sub_product->prefix;
+            // $this->sub_product_id= $sub_product->sub_product_id;
             $this->sub_product_status= $sub_product->sub_product_status;
             $this->sub_product_id= $sub_product->sub_product_id;
             $this->currency= $sub_product->currency;
@@ -234,7 +235,9 @@ class LoanProductDataLoader extends Component
     public function render()
     {
 
-        $this->charges = Charges::get();
+       // $this->charges = Charges::get();
+        $this->charges = Charges::where('product_id',$this->sub_product_id)->get();
+
         $this->currencies = Currencies::get();
         $this->accounts = AccountsModel::where('account_use','internal')->get();
         return view('livewire.products-management.loan-product-data-loader');
@@ -246,6 +249,7 @@ class LoanProductDataLoader extends Component
             "institution_number" => '1001',
             "branch_number" => "101",
             "charge_number" => "101",
+            'product_id'=>$this->sub_product_id,
             "charge_name" => $this->charge_name,
             "charge_type" => $this->charge_type,
             "flat_charge_amount" => $this->charge_amount,

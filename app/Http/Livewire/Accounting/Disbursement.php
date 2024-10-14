@@ -18,43 +18,47 @@ class Disbursement extends Component
 
        $this->principle= $query ->sum('principle');
        $this->applications=$query->count();
-       $this->charges= $this->culculateCharges($query->pluck('id'));
+       $this->charges= $this->calculateCharges($query->pluck('id'));
 
         return view('livewire.accounting.disbursement');
     }
 
 
 
-    function culculateCharges($loan_id){
-
-        $amount=0;
-        foreach($loan_id as $id){
-
-            $principle=DB::table('loans')->where('id',$id)->value('principle');
-
-            $charger_ids=DB::table('loan_has_charges')->where('loan_id', $id)->pluck('charge_id')->toArray();
-
-            $charges=DB::table('charges')->whereIn('id',$charger_ids)->get();
 
 
 
-            foreach($charges as $charge){
+    function calculateCharges($loan_ids) {
 
-                if( $charge->percentage_charge_amount==null){
-                    $amount=$charge->flat_charge_amount;
-                 }else{
+        $total_amount = 0; // Initialize total amount
 
-                    $amount=$charge->percentage_charge_amount * $principle /100 ;
-                 }
+        foreach($loan_ids as $id) {
 
-                 $amount=$amount+$amount;
+            $principle = DB::table('loans')->where('id', $id)->value('principle');
+
+            $charge_ids = DB::table('loan_has_charges')->where('loan_id', $id)->pluck('charge_id')->toArray();
+
+            $charges = DB::table('charges')->whereIn('id', $charge_ids)->get();
+
+            $loan_amount = 0; // Initialize loan amount for each loan
+
+            foreach($charges as $charge) {
+
+                if ($charge->percentage_charge_amount === null) {
+                    // Use flat charge if percentage is null
+                    $loan_amount += $charge->flat_charge_amount;
+                } else {
+                    // Calculate percentage charge based on principle
+                    $loan_amount += ($charge->percentage_charge_amount * $principle) / 100;
+                }
             }
 
-
-
+            // Add the loan's calculated charges to the total amount
+            $total_amount += $loan_amount;
         }
 
-        return $amount;
-
+        return $total_amount;
     }
+
+
 }

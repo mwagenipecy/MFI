@@ -188,6 +188,11 @@ class LoansTable extends LivewireDatatable
         ]);
 
 
+        $member_id= LoansModel::find($id)->member_id;
+
+        DB::table('members')->where('id',$member_id)->update(['client_status'=>'ACTIVE']);
+
+
         $next_due_date = Carbon::now()->toDateTimeString();
 
         foreach ($this->table as $installment) {

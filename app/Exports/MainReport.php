@@ -28,7 +28,7 @@ class MainReport implements FromArray, WithMultipleSheets
 
     public function sheets(): array
     {
-        $clientId=LoansModel::whereIn('id',$this->loanId)->pluck('client_number');
+        $clientId=LoansModel::whereIn('id',$this->loanId)->pluck('member_id');
 
         $guarantor=LoansModel::whereIn('id',$this->loanId)->where('guarantor','!=',null)->pluck('guarantor');
 

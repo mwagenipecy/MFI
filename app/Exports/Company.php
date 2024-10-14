@@ -40,16 +40,16 @@ class Company implements FromArray,WithHeadings, WithStyles, ShouldAutoSize, Wit
 
         $client_numbers=$this->value;
 
-        $loan_datas=LoansModel::whereIn('id',$client_numbers)->pluck('client_number');
+        $loan_datas=LoansModel::whereIn('id',$client_numbers)->pluck('member_id');
         //guarantor
-        $clientDatas=ClientsModel::whereIn('client_number',$loan_datas)->where('membership_type','!=','individual')->pluck('client_number');
+        $clientDatas=ClientsModel::whereIn('id',$loan_datas)->where('membership_type','!=','individual')->pluck('client_number');
 
 
 
         foreach ($clientDatas as $number){
 
             //guarantor
-            $clientData=ClientsModel::where('client_number',$number)->first();
+            $clientData=ClientsModel::where('id',$number)->first();
 
           $array[]=[
 

@@ -53,7 +53,7 @@ class ClientsDetailsReport extends Component
 
            // $LoanId = LoansModel::whereBetween('created_at', [$this->reportStartDate, $this->reportEndDate])->whereIn('client_number', $array)->pluck('id');
 
-            $LoanId = LoansModel::whereIn('client_number', $array)->pluck('id');
+            $LoanId = LoansModel::whereIn('member_id', $array)->pluck('id');
 
             return Excel::download(new MainReport($LoanId), 'generalReport.xlsx');
 

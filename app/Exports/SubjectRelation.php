@@ -51,10 +51,10 @@ class SubjectRelation implements FromArray,WithHeadings, WithStyles, ShouldAutoS
 
             $clientId=LoansModel::where('id',$number)->first();
 
-            $clientData=ClientsModel::where('client_number',$clientId->client_number)->first();
+            $clientData=ClientsModel::where('id',$clientId->member_id)->first();
 
             $array[]=[
-                'CustomerCodeofPrimarySubject'=>$clientId->client_number,
+                'CustomerCodeofPrimarySubject'=>$clientId->member_id,
                 'RelationType'=>$clientId->relationship ? : null,
                 'CustomerCodeofSecondarySubject'=>null,
                 'TaxIdentificationNumber'=>$clientData->tax_identification_number,

@@ -97,7 +97,7 @@
             <div class="w-full border-b border-gray-200 dark:border-gray-700">
             </div>
 
-            <div class="grid grid-cols-6 gap-2 p-2">
+            <div class="grid grid-cols-4 gap-2 p-2">
                 @php
                     $menuItems = [
                         ['id' => 1, 'label' => 'Daily  Report'],
@@ -108,13 +108,13 @@
                         ['id' => 6, 'label' => 'Loan Application Report'],
                         ['id' => 7, 'label' => 'Loan Delinquency Report'],
                         ['id' => 8, 'label' => 'Loan Disbursement and Repayment History'],
-
                         ['id' => 9, 'label' => 'Financial Ratios and Metrics'],
-
                         ['id' => 10, 'label' => 'Loan Approval and Rejection Report'],
                         ['id' => 11, 'label' => 'Loan Committee Meeting Minutes'],
                         ['id' => 12, 'label' => 'Compliance CheckList Report'],
                         ['id' => 13, 'label' => 'CRB Data Submission'],
+                        ['id' => 14, 'label' => 'Age Analysis Report'],
+
 
 
                     ];
@@ -402,7 +402,7 @@
                     @break
 
                         @case('7')
-                    
+
                         <livewire:reports.loan-delinquency-report />
                     @break
 
