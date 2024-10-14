@@ -377,16 +377,16 @@ class FrontDesk extends Component
 
         $this->validate();
         $this->amount = $this->removeNumberFormat($this->amount);
+
         if ($this->payment_type == "CASH") {
             // get loan id of member
             $loanUser = LoansModel::where('loan_id', $this->accountSelected)->first();
-
 
             $id = Teller::where('id', 1)->value('account_id');
             // teller account number
             $teller_account_data = AccountsModel::where('id', $id)->first();
 
-            // credit
+        // credit
             $customer_account_data = AccountsModel::where('id', $loanUser->loan_account_number)->first();
             $new_customer_balance = (float)$this->amount + (float)$customer_account_data->balance;
             // update
@@ -405,9 +405,7 @@ class FrontDesk extends Component
             $records_on_general_ledger = new general_ledger();
             $records_on_general_ledger->credit($teller_account_data->account_number, $new_teller_balance, '0000', $this->amount, 'Cash payment', '');
 
-
             $this->update_repayment($this->accountSelected, (float)$this->amount);
-
             session()->flash('message1', 'Successfully paid');
             $this->resetLoanRepayment();
         } elseif ($this->payment_type == "BANK" || $this->payment_type == "MOBILE") {
@@ -423,14 +421,12 @@ class FrontDesk extends Component
             // update balance
             AccountsModel::where('id', $this->bank)->update(['balance' => $mirrorr_account_new_balance]);
 
-
             // customer
             $customer_account_details = AccountsModel::where('account_number', $this->accountSelected)->first();
 
             //update balance
             $loan_account_new_balance = (float)$customer_account_details->balance + (float)$this->amount;
             AccountsModel::where('account_number', $customer_account_details->account_number)->update(['balance' => $loan_account_new_balance]);
-
 
             // credit on
             $gl_credit_record_on_customer_account = new general_ledger();
@@ -447,16 +443,13 @@ class FrontDesk extends Component
             // customer
             $customer_account_details = AccountsModel::where('id', $this->accountSelected)->first();
 
-
             //update balance
             $loan_account_new_balance = (float)$customer_account_details->balance + (float)$this->amount;
             AccountsModel::where('account_number', $customer_account_details->account_number)->update(['balance' => $loan_account_new_balance]);
 
-
             // credit on
             $gl_credit_record_on_customer_account = new general_ledger();
             $gl_credit_record_on_customer_account->creditWithReference($customer_account_details->account_number, $loan_account_new_balance, '520100002220', $this->amount, 'Savings deposit by member', $this->reference_number);
-
 
             // customer
             $member_savings_account_details = AccountsModel::where('account_number', '520100002220')->first();

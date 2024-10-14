@@ -61,7 +61,7 @@ class NewLoanProduct extends Component
     public $require_image_member;
     public $require_image_id;
     public $require_mobile_number;
-    public $create_during_registration;
+    public $create_during_registration, $sub_product_id;
     public $notes;
 
 
@@ -149,7 +149,7 @@ class NewLoanProduct extends Component
 
     public function render()
     {
-        $this->charges = Charges::get();
+        $this->charges = Charges::where('product_id',$this->sub_product_id)->get();
         $this->currencies = Currencies::get();
         $this->accounts = AccountsModel::where('major_category_code',1000)->get();
         return view('livewire.products-management.new-loan-product');

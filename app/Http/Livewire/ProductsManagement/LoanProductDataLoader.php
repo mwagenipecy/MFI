@@ -64,7 +64,7 @@ class LoanProductDataLoader extends Component
     public $require_image_id;
     public $require_mobile_number;
     public $create_during_registration;
-    public $notes;
+    public $notes,$sub_product_id;
 
 
     public $product_id;
@@ -108,6 +108,7 @@ class LoanProductDataLoader extends Component
             $this->sub_product_name= $sub_product->sub_product_name;
             $this->prefix= $sub_product->prefix;
             $this->sub_product_status= $sub_product->sub_product_status;
+            $this->sub_product_id= $sub_product->sub_product_id;
             $this->currency= $sub_product->currency;
             $this->has_partner= $sub_product->has_partner;
             $this->disbursement_account= $sub_product->disbursement_account;
@@ -142,10 +143,6 @@ class LoanProductDataLoader extends Component
             $this->require_mobile_number= $sub_product->require_mobile_number;
             $this->notes= $sub_product->notes;
             $this->product_id= $sub_product->product_id;
-
-
-
-
 
         }
 
@@ -221,7 +218,6 @@ class LoanProductDataLoader extends Component
                 "require_image_id" => $this->require_image_id,
                 "require_mobile_number" => $this->require_mobile_number,
                 "notes"=> $this->notes,
-                "sub_product_status"=> "Pending",
 
 
 
