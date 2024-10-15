@@ -519,7 +519,7 @@
                 @if($this->charge_type == 'fixed')
                     <div>
                         <label for="charge_amount" class="block mb-2 sm:text-xs font-medium text-gray-900 dark:text-gray-300">Amount</label>
-                        <input type="number" wire:model.debounce.500ms="charge_amount" id="charge_amount" class="sm:text-xs ml-1 block w-full p-2 text-gray-900 border
+                        <input type="number" wire:model="charge_amount"  class="sm:text-xs ml-1 block w-full p-2 text-gray-900 border
                                             border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600
                                              dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     </div>
