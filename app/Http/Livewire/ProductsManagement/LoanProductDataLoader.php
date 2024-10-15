@@ -162,12 +162,12 @@ class LoanProductDataLoader extends Component
         $this->principle_max_value= number_format($amaunt);
 
     }
-    function updatedChargeAmount($amaunt)
-    {
-        $amaunt= (int)$amaunt;
-        $this->charge_amount= number_format($amaunt);
+    // function updatedChargeAmount($amaunt)
+    // {
+    //     $amaunt= (int)$amaunt;
+    //     $this->charge_amount= number_format($amaunt);
 
-    }
+    // }
 
     function removeNumberFormat($amount)
     {
