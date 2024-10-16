@@ -25,7 +25,7 @@
   <!-- Portfolio Summary -->
   <hr class="border-2 border-red-500 mx-2 ">
 
-  
+
   <div class="bg-white rounded-lg p-2 mb-8">
     <h4 class="text-lg font-semibold uppercase mb-4">1. Portfolio Summary</h4>
     <table class="min-w-full table-auto">
@@ -72,7 +72,7 @@
           <th class="px-4 border py-2 text-left text-gray-600 font-medium">Loan Type</th>
           <th class="px-4 border py-2 text-left text-gray-600 font-medium">Number of Loans</th>
           <th class="px-4 border py-2 text-left text-gray-600 font-medium">Total Amount Disbursed</th>
-          <th class="px-4 border py-2 text-left text-gray-600 font-medium">Outstanding Principal</th>
+          <th class="px-4 border py-2 text-left text-gray-600 font-medium">Outstanding Amount</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
@@ -124,7 +124,7 @@
         <tr>
           <td class="px-4 border py-2 text-gray-800"> {{ $value['label'] }}</td>
           <td class="px-4  border py-2 text-gray-800">450</td>
-          <td class="px-4 border py-2 text-gray-800">$1,600,000</td>
+          <td class="px-4 border py-2 text-gray-800">600,000</td>
         </tr>
 
         @endforeach
