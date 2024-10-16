@@ -533,7 +533,7 @@
                                                   dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
                                                     %
                                                   </span>
-                            <input type="text" wire:model.bounce="charge_percent" id="charge_percent" class="w-12 p-2 text-gray-900 border border-gray-300
+                            <input type="text" wire:model.bounce="charge_percent"  class="w-12 p-2 text-gray-900 border border-gray-300
                                                     rounded-r-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600
                                                     dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         </div>

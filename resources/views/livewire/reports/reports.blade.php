@@ -390,15 +390,17 @@
                         <livewire:reports.client-loan-account />
                     @break
                         @case('4')
-                        <livewire:reports.client-loan-account />
+                        <livewire:reports.repayment />
                     @break
 
                         @case('5')
-                        <livewire:reports.client-repayment-history />
+                        <livewire:reports.loan-portifolio-report />
                     @break
 
                         @case('6')
-                        <livewire:reports.loan-portifolio-report />
+                        <livewire:reports.client-repayment-history />
+
+
                     @break
 
                         @case('7')

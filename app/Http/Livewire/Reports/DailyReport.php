@@ -93,9 +93,8 @@ class DailyReport extends Component
     function updatedDayDate($date){
 
         $this->day_date=$date;
-
-        $this->emit('refreshComponent');
-
+        $this->selectedBranch($this->tab_id);
+        
     }
     public function render()
     {
