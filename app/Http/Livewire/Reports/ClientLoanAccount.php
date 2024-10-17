@@ -48,7 +48,7 @@ public function columns()
         column::callback(['loan_id','member_number'],function($loan_number,$member_no){
 
             $member= DB::table('members')->where('member_number',$member_no)->first();
-            return $member ?->first_name.' '. $member ?->middle_name.'  '. $member ?->last_name .'('.$loan_number.')';
+            return $member ?->first_name.' '. $member ?->middle_name.'  '. $member ?->last_name ;
 
         })->label('account number'),
         //column::name('member_number')->label('client number'),

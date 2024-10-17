@@ -102,9 +102,9 @@
                     $menuItems = [
                         ['id' => 1, 'label' => 'Daily  Report'],
                         ['id' => 2, 'label' => 'Clients Details Report'],
-                        ['id' => 3, 'label' => 'Client Loan Accounts'],
+                        ['id' => 3, 'label' => 'Loan Portfolio Report'],
                         ['id' => 4, 'label' => 'Client Repayment History'],
-                        ['id' => 5, 'label' => 'Loan Portfolio Report'],
+                        ['id' => 5, 'label' => 'Loan Portfolio Summary'],
                         ['id' => 6, 'label' => 'Loan Application Report'],
                         ['id' => 7, 'label' => 'Loan Delinquency Report'],
                         ['id' => 8, 'label' => 'Loan Disbursement and Repayment History'],
@@ -398,7 +398,7 @@
                     @break
 
                         @case('6')
-                        <livewire:reports.client-repayment-history />
+                        <livewire:reports.loan-application-report />
 
 
                     @break
