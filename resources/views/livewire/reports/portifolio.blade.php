@@ -58,8 +58,10 @@
                 <option value="ACTIVE" > ACTIVE </option>
 
                 <option value="ONPROGRESS" > ONPROGRESS  </option>
+                <option value="AWAITING APPROVAL" >AWAITING APPROVAL  </option>
+
                 <option value="REJECTED" > REJECTED  </option>
-                <option value="LOAN COMMITTEE" > LOAN COMMITTEE  </option>
+                <option value="AWAITING DISBURSEMENT" > AWAITING DISBURSEMENT  </option>
 
 
             </select>
