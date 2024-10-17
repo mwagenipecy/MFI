@@ -87,8 +87,8 @@ public function columns()
     return [
 
         Column::index($this),
-        column::name('heath')->label('health'),
-        column::name('updated_at')->label('health'),
+        // column::name('heath')->label('health'),
+        // column::name('updated_at')->label('health'),
 
        // column::name('id')->label('id'),
 
@@ -122,7 +122,7 @@ public function columns()
         column::callback('interest',function ($interest){
             return $interest.'%';
         })->label('interest')->searchable(),
-        column::name('tenure')->label('tenure'),
+        column::name('tenure')->label('tenure') ->enableSummary(),
         column::name('status')->label('status')
 
 
