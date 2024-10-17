@@ -23,7 +23,7 @@ class ClientLoanAccount extends LivewireDatatable
     public $start_date;
     public $end_date,$status,$aging,$branch;
     public $sortByBranch;
-    public $exportStyles=true,$exportWidths=true;
+    public $exportStyles=false,$exportWidths=false;
 
     protected $listeners=['changeStatus','changeAging',
                        'changeStartDate','changeEndDate','changeBranch'];
@@ -87,20 +87,28 @@ public function columns()
     return [
 
         Column::index($this),
+        column::name('heath')->label('health'),
+        column::name('updated_at')->label('health'),
+
+       // column::name('id')->label('id'),
+
 
         column::name('created_at')->label('issue date') ,
         // column::name('loan_id')->label(label: 'id'),
+
         column::callback(['loan_id','member_number'],function($loan_number,$member_no){
 
             $member= DB::table('members')->where('member_number',$member_no)->first();
             return $member ?->first_name.' '. $member ?->middle_name.'  '. $member ?->last_name ;
 
-        })->label('account number'),
+        })->label('account Name'),
+
         //column::name('member_number')->label('client number'),
         column::callback('loan_sub_product',function($sub_product_id){
             return DB::table('loan_sub_products')->where('sub_product_id',$sub_product_id)->value('sub_product_name');
         })->label('product name')->filterable(DB::table('loan_sub_products')->pluck('sub_product_name', 'sub_product_id')->toArray()),
-        
+
+
         column::callback('branch_id',function($branch_id){
             return BranchesModel::where('id',$branch_id)->value('name');
         })->label('branch'),
@@ -114,7 +122,6 @@ public function columns()
         column::callback('interest',function ($interest){
             return $interest.'%';
         })->label('interest')->searchable(),
-        column::name('heath')->label('health'),
         column::name('tenure')->label('tenure'),
         column::name('status')->label('status')
 
@@ -141,29 +148,14 @@ public function buildActions()
                 return [
                     Action::value('csv')->label('Export CSV')->export('loanPortifolio.csv'),
                     Action::value('html')->label('Export HTML')->export('loanPortifolio.html'),
-                    Action::value('xlsx')->label('Export XLSX')->export('loanPortifolio.xlsx')->styles($this->exportStyles)->widths($this->exportWidths)
+                   // Action::value('xlsx')->label('Export XLSX')->export('loanPortifolio.xlsx')->styles($this->exportStyles)->widths($this->exportWidths)
                 ];
             }),
         ];
     }
 
 
-    public function getExportStylesProperty()
-    {
-        return [
-            '1'  => ['font' => ['bold' => true]],
-            'B2' => ['font' => ['italic' => true]],
-            'C'  => ['font' => ['size' => 16]],
-        ];
-    }
 
-    public function getExportWidthsProperty()
-    {
-        return [
-            'A' => 55,
-            'B' => 45,
-        ];
-    }
 
 
 }
