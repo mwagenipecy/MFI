@@ -123,8 +123,8 @@
 
         <tr>
           <td class="px-4 border py-2 text-gray-800"> {{ $value['label'] }}</td>
-          <td class="px-4  border py-2 text-gray-800">450</td>
-          <td class="px-4 border py-2 text-gray-800">600,000</td>
+          <td class="px-4  border py-2 text-gray-800">{{$value['count']  }} </td>
+          <td class="px-4 border py-2 text-gray-800">{{ number_format($value['principle'],2) }} </td>
         </tr>
 
         @endforeach
@@ -134,8 +134,8 @@
       <tfoot class="bg-red-50">
         <tr>
           <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Total </th>
-          <th class="px-4 border py-2 text-left text-gray-600 font-medium"> 200 </th>
-          <th class="px-4 border py-2 text-left text-gray-600 font-medium"> 50,000 </th>
+          <th class="px-4 border py-2 text-left text-gray-600 font-medium"> {{ $total_count }} </th>
+          <th class="px-4 border py-2 text-left text-gray-600 font-medium"> {{number_format( $total_principle,2) }} TZS </th>
         </tr>
       </tfoot>
 

@@ -17,14 +17,17 @@ class LoanPortifolioReport extends Component
     public $loan_average_size;
     public $loan_product,$loanStatusData;
     public $count,$amount,$amount2;
+    public $total_count;
+    public $total_principle;
 
     public $loan_status=[
-        ['id'=>1, 'label'=>'Current Loan'],
-        ['id'=>2, 'label'=>'In Arrears (Up to 30 days)'],
-        ['id'=>3, 'label'=>'In Arrears (Up to 60 days)'],
-        ['id'=>4, 'label'=>'In Arrears (Up to 90 days)'],
-        ['id'=>5, 'label'=>'In Arrears (Up to 180 days)'],
-        ['id'=>6, 'label'=>'Non-performing (Over 180 days)'],
+        ['id'=>1,'day'=>0, 'label'=>'Current Loan(Below 10)'],
+        ['id'=>2,'day'=>10, 'label'=>'In Arrears (over 10 days)'],
+        ['id'=>2,'day'=>30, 'label'=>'In Arrears (over 30 days)'],
+        ['id'=>3,'day'=>60, 'label'=>'In Arrears (over 60 days)'],
+        ['id'=>4,'day'=>90, 'label'=>'In Arrears (over 90 days)'],
+        ['id'=>5,'day'=>180, 'label'=>'In Arrears (over 180 days)'],
+        ['id'=>6, 'day'=>190,'label'=>'Non-performing (Over 180 days)'],
     ];
 
 
@@ -42,9 +45,34 @@ class LoanPortifolioReport extends Component
 
     public function loanStatusList(){
 
+        $count_total=0;
+        $principle_total=0;
+        $values=$this->loan_status;
+        foreach( $values as &$data){
 
-        return $this->loan_status;
+            $loan_schedule= loans_schedules::query()->where('days_in_arrears','>=',$data['day'])
+            ->where('completion_status','!=','CLOSED');
+
+            $data['count']=$loan_schedule->count();
+            $count_total+= $data['count'];
+
+            $loan_id=loans_schedules::query()->where('days_in_arrears','>=',$data['day'])->pluck('loan_id')->toArray();
+
+             $amount=loans_schedules::query()->whereIn('loan_id', $loan_id)
+             ->where('completion_status','!=','CLOSED');
+            $data['principle'] =$amount->sum('principle');
+
+            $principle_total+= $data['principle'] ;
+        }
+
+        $this->total_count=$count_total;
+        $this->total_principle=$principle_total;
+
+       // dd($values);
+        return  $values;
     }
+
+
 
     function loanDistribution(){
 
