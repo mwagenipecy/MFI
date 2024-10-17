@@ -386,9 +386,12 @@
                             <livewire:reports.clients-details-report />
 {{--                            <livewire:reports.general-loan-report />--}}
                         @break
+
                      @case('3')
-                        <livewire:reports.client-loan-account />
+                        <livewire:reports.portifolio />
                     @break
+
+
                         @case('4')
                         <livewire:reports.repayment />
                     @break

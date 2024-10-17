@@ -19,21 +19,60 @@ class ClientLoanAccount extends LivewireDatatable
     public $value;
     public $exportable=true;
     public $start_date;
-    public $end_date;
+    public $end_date,$status,$aging,$branch;
     public $sortByBranch;
 
+    protected $listeners=['changeStatus','changeAging',
+                       'changeStartDate','changeEndDate','changeBranch'];
 
+
+
+    function changeEndDate($date){
+        $this->end_date=$date;
+    }
+    function changeStartDate($date){
+    $this->start_date=$date;
+    }
+
+    function changeBranch($branch){
+        $this->branch=$branch;
+        }
+
+        function changeStatus($status){
+            $this->status=$status;
+            }
 
   public function builder(){
 
-     $query=LoansModel::query()->where('status','ACTIVE');
+     $query=LoansModel::query();
+     //->where('status','ACTIVE');
 
     if(!empty($this->start_date)){
-        $query=$query->where('created_at','>=',$this->start_date)->where('branch_id',session()->get('sortingBranch'));
+        $query=$query->where('created_at','>=',$this->start_date);
+        //->where('branch_id',session()->get('sortingBranch'));
     }
-    elseif(!empty($this->end_date)){
-       $query= $query->where('created_at','<=',$this->end_date)->where('branch_id',session()->get('sortingBranch'));
+
+    if(!empty($this->end_date)){
+       $query= $query->where('created_at','<=',$this->end_date);
+       //->where('branch_id',session()->get('sortingBranch'));
     }
+
+
+    if(!empty($this->branch)){
+        $query= $query->where('branch_id',$this->branch);
+     }
+
+     if(!empty($this->status)){
+        $query= $query->where('status',$this->status);
+     }
+
+
+     if(!empty($this->aging)){
+        $query= $query->where('status',$this->aging);
+     }
+
+
+
    return  $query;
 }
 
