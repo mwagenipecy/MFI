@@ -55,7 +55,10 @@ class LoanApplicationReport extends LivewireDatatable
 
                 Column::name('loan_account_number')
                     ->label('loan account number'),
-
+            column::callback('loan_sub_product',function($sub_product_id){
+                return DB::table('loan_sub_products')->where('sub_product_id',$sub_product_id)->value('sub_product_name');
+            })->label('product name')->filterable(DB::table('loan_sub_products')->pluck('sub_product_name', 'sub_product_id')->toArray()),
+    
                 Column::callback(['days_in_arrears'],function($days_in_arrears){
                     if($days_in_arrears >0){
                         return '<div class="bg-red-500 p-2 "> '.$days_in_arrears.' </div>';
