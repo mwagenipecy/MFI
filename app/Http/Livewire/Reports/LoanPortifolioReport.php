@@ -61,7 +61,9 @@ class LoanPortifolioReport extends Component
 
              $amount=loans_schedules::query()->whereIn('loan_id', $loan_id)
              ->where('completion_status','!=','CLOSED');
-            $data['principle'] =$amount->sum('principle');
+            $data['principle'] =$amount->sum('principle') - ($amount->sum('payment') ? abs( $amount->sum('payment')   -$amount->sum('interest')) :0 ) ;
+
+            // $amount->sum('principle');
 
             $principle_total+= $data['principle'] ;
         }
@@ -85,9 +87,15 @@ class LoanPortifolioReport extends Component
 
             $loan_ids=LoansModel::where('status','ACTIVE')->where('loan_sub_product',$data->sub_product_id)->pluck('loan_id')->toArray();
             $loan= loans_schedules::query()->whereIn('loan_id',$loan_ids);
-            $data['loan_no']=LoansModel::where('status','ACTIVE')->where('loan_sub_product',$data->sub_product_id)->count();
-            $data['amount_disbursed']=LoansModel::where('status','ACTIVE')->where('loan_sub_product',$data->sub_product_id)->sum('principle');
-            $data['out_standing_amount']=  $loan->sum('principle') - ($loan->sum('payment') -$loan->sum('interest')) ;
+            $data['loan_no']=LoansModel::where('status','ACTIVE')
+                              ->where('loan_sub_product',$data->sub_product_id)->count();
+
+                    $loanData =   LoansModel::query()->where('status','ACTIVE')
+                              ->where('loan_sub_product',$data->sub_product_id);
+
+            $data['amount_disbursed']= $loanData->sum('principle') - $this->calculateCharges($loanData->pluck('id')->toArray());
+
+            $data['out_standing_amount']=  $loan->sum('principle') - ($loan->sum('payment') ? abs( $loan->sum('payment')   -$loan->sum('interest')) :0 ) ;
 
             $count+=$data->loan_no;
             $amount+=$data->amount_disbursed;

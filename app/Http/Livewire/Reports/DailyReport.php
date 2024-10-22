@@ -45,7 +45,9 @@ class DailyReport extends Component
          $loan_id=$query2 ->distinct('loan_id')->pluck('loan_id');
 
 
-        $loan_ids=  LoansModel::query()->whereDate('updated_at',$this->day_date)->where('status','ACTIVE')->pluck('id')->toArray();
+        $loan_ids=  LoansModel::query()->whereDate('updated_at',$this->day_date)
+                  ->where('branch_id',$id)
+              ->where('status','ACTIVE')->pluck('id')->toArray();
 
 
         $this->emit('sortLoanId', $loan_ids);
