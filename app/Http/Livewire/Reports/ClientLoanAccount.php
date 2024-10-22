@@ -128,7 +128,7 @@ public function columns()
         column::callback('interest',function ($interest){
             return $interest.'%';
         })->label('interest')->searchable(),
-        column::name('tenure')->label('tenure') ->enableSummary(),
+        column::name('tenure')->label('tenure (Month (s) )') ->enableSummary(),
         column::name('status')->label('status')
 
 
