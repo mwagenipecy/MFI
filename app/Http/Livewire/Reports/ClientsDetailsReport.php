@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MainReport;
 use App\Exports\LoanSchedule;
 use App\Exports\ContractData;
+use Illuminate\Support\Facades\DB;
 
 class ClientsDetailsReport extends Component
 {
@@ -23,17 +24,24 @@ class ClientsDetailsReport extends Component
 
     public function downloadExcelFile()
     {
+
         if ($this->client_type == "MULTIPLE") {
 
+
+
             $input = $this->custome_client_number;
+
+
             // Remove the trailing comma if it exists
             $input = rtrim($input, ',');
 
             // Split the input string into an array of numbers using comma as the delimiter
             $numbers = explode(',', $input);
 
+            $array=[];
             // Iterate through the array and process each number
             foreach ($numbers as $number) {
+                $aray2=[];
                 // Trim any whitespace from the number
                 $number = trim($number);
 
@@ -42,18 +50,30 @@ class ClientsDetailsReport extends Component
 
 
                 // Do something with the individual number, for example, print it
-                if (LoansModel::where('client_number', $number)->exists()) {
-                    $array[] = ['number' => str_pad($number, 4, 0, STR_PAD_LEFT)];
+                if (LoansModel::where('member_id', DB::table('members')->where('member_number',$number)->value('id'))->exists()) {
+
+                    $array[] = DB::table('members')->where('member_number',$number)->value('id');
+
                 } else {
+
 
                 }
 
 
             }
 
+
+            if (!is_array($array) || empty($array)) {
+                session()->flash('message_fail', 'There is no loan information for such user');
+                return; // Return to stop further processing
+            }
+
+
+
            // $LoanId = LoansModel::whereBetween('created_at', [$this->reportStartDate, $this->reportEndDate])->whereIn('client_number', $array)->pluck('id');
 
-            $LoanId = LoansModel::whereIn('member_id', $array)->pluck('id');
+            $LoanId = LoansModel::whereIn('member_id', $array)->pluck('id')->toArray();
+
 
             return Excel::download(new MainReport($LoanId), 'generalReport.xlsx');
 

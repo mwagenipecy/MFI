@@ -1,11 +1,35 @@
 <div>
     {{-- Do your work, then step back. --}}
     <div class="w-full flex ">
-        <div class="w-3/4">
 
-        </div>
-        <div class="w-1/3 w-100">
-            <input wire:model="day_date" type="date" class="mb-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-500">
+
+        <div class="flex w-full gap-2 mb-2 mb-2">
+            <div class="ml-2">
+                <label for="category" class="block mb-2 dark:text-gray-400 space-x-2 text-sm font-semibold spacing-sm text-slate-600">
+                     Date
+                </label>
+                <div class="relative ">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <input datepicker="" datepicker-autohide="" wire:model="day_date" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-500 flatpickr-input" placeholder="Select date">
+                </div>
+            </div>
+            {{-- <div class="">
+                <label for="category" class="block mb-2 dark:text-gray-400 space-x-2 text-sm font-semibold spacing-sm text-slate-600">
+                    End Date
+                </label>
+                <div class="relative ">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <input datepicker="" datepicker-autohide="" wire:model="endDate" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-500 flatpickr-input" placeholder="Select date">
+                </div>
+            </div> --}}
 
         </div>
 
@@ -106,4 +130,28 @@
 
     </div>
     </div>
+
+    <div class="w-full overflow-x-auto  p-2 ">
+
+     <livewire:reports.daily-table />
+
+    </div>
+
+
+
+
+
+
+
+    <script>
+        flatpickr('[datepicker]', {
+            dateFormat: "Y-m-d"
+            , autoHide: true
+            , allowInput: true
+            , minDate: "2000-01-01"
+            , maxDate: new Date().fp_incr(14)
+        });
+    </script>
+
+
 </div>

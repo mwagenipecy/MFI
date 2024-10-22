@@ -37,7 +37,7 @@
               <th class="px-4 border py-2 text-left text-gray-600 font-medium">Total Outstanding Principal </th>
               <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Total Repaid Loans </th>
               <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Average Loan Size</th>
-              <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Loan Disbursement Rate (Monthly) </th>
+              {{-- <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Loan Disbursement Rate (Monthly) </th> --}}
 
             </tr>
           </thead>
@@ -47,13 +47,13 @@
           <td class="py-2 border text-center  text-gray-600"> {{ number_format($loan_disbursement,2) }} TZS  </td>
           <td class="py-2 border text-center  text-gray-600 ">{{ $total_active_loan ?:0 }} </td>
 
-          <td class="py-2 border text-center  text-gray-600 f"> {{ number_format($out_standing_amount,2 ) }} TZS </td>
+          <td class="py-2 border text-center  text-gray-600 f"> {{ number_format($out_standing_amountx,2 ) }} TZS </td>
 
           <td class="py-2 border text-center  text-gray-600 "> {{ number_format($total_repaid_amount,2) }} TZS</td>
 
           <td class="py-2 border text-center  text-gray-600 "> {{ number_format($loan_average_size,2) }} TZS</td>
 
-          <td class="py-2 border  text-center  text-gray-600 "> 20 %  </td>
+          {{-- <td class="py-2 border  text-center  text-gray-600 "> 20 %  </td> --}}
         </tr>
 
       </tbody>

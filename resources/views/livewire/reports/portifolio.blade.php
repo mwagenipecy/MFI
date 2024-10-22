@@ -29,6 +29,10 @@
                 <input datepicker="" datepicker-autohide="" wire:model="endDate" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-red-500 dark:focus:border-red-500 flatpickr-input" placeholder="Select date">
             </div>
         </div>
+
+
+
+
         <div>
             <label for="nodes" class="block mb-2 dark:text-gray-400 space-x-2 text-sm font-semibold spacing-sm text-slate-600">
                Select Branch
@@ -107,6 +111,41 @@
 
 
     <livewire:reports.client-loan-account />
+
+    <div class="bg-white rounded-lg p-2 mb-8">
+        <h4 class="text-lg font-semibold uppercase mb-4">1. Table Summary</h4>
+        <table class="min-w-full table-auto">
+
+            <thead class="bg-red-50">
+                <tr>
+                  <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Total Principle  </th>
+                  <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Total Interest  </th>
+                  <th class="px-4 border py-2 text-left text-gray-600 font-medium">Total  </th>
+                  {{-- <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Total Repaid Loans </th>
+                  <th class="px-4 border py-2 text-left text-gray-600 font-medium"> Average Loan Size</th> --}}
+
+
+                </tr>
+              </thead>
+
+          <tbody class="divide-y divide-gray-200 gap-2 p-2">
+            <tr>
+              <td class="py-2 border text-center  text-gray-600">  {{ number_format(session('summAmount'),2) }} TZS  </td>
+              <td class="py-2 border text-center  text-gray-600 "> {{number_format((session('summAmount') * session('interest')/100 ),)  }}  TZS </td>
+
+              <td class="py-2 border text-center  text-gray-600 f">  {{  number_format(( session('summAmount') + (session('summAmount') * session('interest')/100 )),2  ) }} TZS  </td>
+{{--
+              <td class="py-2 border text-center  text-gray-600 "> 0.00 TZS</td>
+
+              <td class="py-2 border text-center  text-gray-600 "> 900,000.00 TZS</td> --}}
+
+
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
 
 
 

@@ -3,83 +3,57 @@
 namespace App\Http\Livewire\Reports;
 
 use Livewire\Component;
-
-use App\Models\BranchesModel;
+use App\Models\loans_schedules;
+use Carbon\Carbon;
+use App\Models\issured_shares;
 use App\Models\LoansModel;
+use App\Models\BranchesModel;
+use App\Models\Employee;
+use Illuminate\Support\Facades\DB;
 use App\Models\sub_products;
 use DateTime;
-use Illuminate\Support\Facades\DB;
-use Mediconesystems\LivewireDatatables\Column;
 use Mediconesystems\LivewireDatatables\Action;
 
+use Illuminate\Support\Str;
+use Mediconesystems\LivewireDatatables\Column;
+use Mediconesystems\LivewireDatatables\NumberColumn;
+use Mediconesystems\LivewireDatatables\DateColumn;
 use Mediconesystems\LivewireDatatables\Http\Livewire\LivewireDatatable;
-
-
-class ClientLoanAccount extends LivewireDatatable
+use Illuminate\Support\Facades\Session;
+use App\Models\search;
+class DailyTable extends LivewireDatatable
 {
 
-    public $value;
-    public $exportable=true;
-    public $start_date;
-    public $end_date,$status,$aging,$branch;
-    public $sortByBranch;
-    public $exportStyles=false,$exportWidths=false;
-
-    protected $listeners=['changeStatus','changeAging',
-                       'changeStartDate','changeEndDate','changeBranch'];
+    public $exportable = true;
+    public $array=[];
+    protected $listeners = [
+        'refreshSavingsComponent' => '$refresh',
+        'sortLoanId' => 'sortLoanId',
+    ];
 
 
 
-    function changeEndDate($date){
-        $this->end_date=$date;
-    }
-    function changeStartDate($date){
-    $this->start_date=$date;
+    public function sortLoanId($value)
+    {
+        $this->array = $value;
     }
 
-    function changeBranch($branch){
-        $this->branch=$branch;
-        }
+    public function builder(){
 
-        function changeStatus($status){
-            $this->status=$status;
-            }
+        $query=LoansModel::query();
+        //->where('status','ACTIVE');
 
-  public function builder(){
+    //    if(!empty($this->array)){
+           $query=$query->whereIn('id',$this->array);
+           //->where('branch_id',session()->get('sortingBranch'));
+    //    }
 
-     $query=LoansModel::query();
-     //->where('status','ACTIVE');
 
-    if(!empty($this->start_date)){
-        $query=$query->where('created_at','>=',$this->start_date);
-        //->where('branch_id',session()->get('sortingBranch'));
+
+       return  $query;
+
+
     }
-
-    if(!empty($this->end_date)){
-       $query= $query->where('created_at','<=',$this->end_date);
-       //->where('branch_id',session()->get('sortingBranch'));
-    }
-
-
-    if(!empty($this->branch)){
-        $query= $query->where('branch_id',$this->branch);
-     }
-
-     if(!empty($this->status)){
-        $query= $query->where('status',$this->status);
-     }
-
-
-     if(!empty($this->aging)){
-        $query= $query->where('status',$this->aging);
-     }
-
-     session()->put('summAmount',$query->sum('principle') );
-     session()->put('interest',$query->sum('interest') );
-
-   return  $query;
-}
-
 
 
 
@@ -120,11 +94,6 @@ public function columns()
         Column::callback(['interest','principle'],function($interest,$principle){
             return number_format($interest*$principle/100 ,2);
         })->label('interest Amount'),
-
-        Column::callback(['interest','principle','id'],function($interest,$principle,$id){
-            return number_format(($interest*$principle/100 + $principle ) ,2);
-        })->label('Total Amount'),
-
         column::callback('interest',function ($interest){
             return $interest.'%';
         })->label('interest')->searchable(),
@@ -159,7 +128,6 @@ public function buildActions()
             }),
         ];
     }
-
 
 
 

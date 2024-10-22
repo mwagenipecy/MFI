@@ -14,6 +14,7 @@ class DailyReport extends Component
 {
 
     public $tab_id;
+    public $endDate;
     public $total_principle;
     public $total_disbursement_amount;
     public $total_repayment;
@@ -34,11 +35,20 @@ class DailyReport extends Component
 
 
          //
-         $this->total_principle=LoansModel::whereDate('updated_at',$this->day_date)->where('status','ACTIVE')->where('branch_id',$id)->sum('principle');
-         // get first the loan id
-         $loan_id=loans_schedules::where('created_at',$this->day_date)->distinct('loan_id')->pluck('loan_id');
+         $query=LoansModel::query()-> whereDate('updated_at',$this->day_date)->where('status','ACTIVE')->where('branch_id',$id);
 
-        $loan_ids=  LoansModel::whereDate('updated_at',$this->day_date)->where('status','ACTIVE')->pluck('id')->toArray();
+         if($this->endDate){ $query->whereDate('updated_at','<=',$this->endDate); }
+         $this->total_principle =  $query->sum('principle');
+
+         // get first the loan id
+         $query2=loans_schedules::query()->where('created_at',$this->day_date);
+         $loan_id=$query2 ->distinct('loan_id')->pluck('loan_id');
+
+
+        $loan_ids=  LoansModel::query()->whereDate('updated_at',$this->day_date)->where('status','ACTIVE')->pluck('id')->toArray();
+
+
+        $this->emit('sortLoanId', $loan_ids);
 
         $charges= $this->calculateCharges( $loan_ids);
 
@@ -94,10 +104,20 @@ class DailyReport extends Component
 
         $this->day_date=$date;
         $this->selectedBranch($this->tab_id);
-        
+
+    }
+
+    function updatedEndDate($endDate){
+        $this->endDate=$endDate;
+        $this->selectedBranch($this->tab_id);
+
+
     }
     public function render()
     {
         return view('livewire.reports.daily-report');
     }
+
+
+
 }

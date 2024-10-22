@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Reports;
 use App\Models\Loan_sub_products;
 use App\Models\loans_schedules;
 use App\Models\LoansModel;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class LoanPortifolioReport extends Component
@@ -12,7 +13,7 @@ class LoanPortifolioReport extends Component
 
     public $loan_disbursement;
     public $total_active_loan;
-    public $out_standing_amount;
+    public $out_standing_amountx;
     public $total_repaid_amount;
     public $loan_average_size;
     public $loan_product,$loanStatusData;
@@ -86,7 +87,7 @@ class LoanPortifolioReport extends Component
             $loan= loans_schedules::query()->whereIn('loan_id',$loan_ids);
             $data['loan_no']=LoansModel::where('status','ACTIVE')->where('loan_sub_product',$data->sub_product_id)->count();
             $data['amount_disbursed']=LoansModel::where('status','ACTIVE')->where('loan_sub_product',$data->sub_product_id)->sum('principle');
-            $data['out_standing_amount']= $loan->sum('installment') - $loan->sum('payment') ;
+            $data['out_standing_amount']=  $loan->sum('principle') - ($loan->sum('payment') -$loan->sum('interest')) ;
 
             $count+=$data->loan_no;
             $amount+=$data->amount_disbursed;
@@ -114,15 +115,16 @@ class LoanPortifolioReport extends Component
 
     function loanSummary(){
         $this->loan_disbursement=$this->loanDisbursed();
+
         $this->total_active_loan=$this->activeLoan();
-        $this->out_standing_amount=$this->outStandingAmount();
+        $this->out_standing_amountx=$this->outStandingAmount();
         $this->total_repaid_amount=$this->repaidLoan();
         $this->loan_average_size=$this->averageLoanSize();
     }
 
     function averageLoanSize(){
 
-        $total_loan= $this->loan_disbursement;
+        $total_loan= LoansModel::where('status','ACTIVE')->sum('principle');
         $loan_no=$this->total_active_loan ? :1 ;
 
         return ($total_loan/$loan_no);
@@ -138,12 +140,49 @@ class LoanPortifolioReport extends Component
     function outStandingAmount(){
 
         $query=loans_schedules::query()->whereIn('loan_id',$this->loanIds());
-        return $query->sum('installment')- $query->sum('payment');
+         return   $query->sum('principle') - ($query->sum('payment') ? $query->sum('payment') -  $query->sum('interest') : 0);
     }
     function activeLoan(){
         return LoansModel::where('status','ACTIVE')->count();
     }
     function loanDisbursed(){
-        return LoansModel::where('status','!=','REJECTED')->sum('principle');
+        $query=LoansModel::query()->where('status','!=','REJECTED');
+         $charges= $this->calculateCharges( $query->pluck('id')->toArray());
+        return  $query->sum('principle') - $charges;
+
+        // minus chargers
+
+    }
+
+    function calculateCharges($loan_ids) {
+
+        $total_amount = 0; // Initialize total amount
+
+        foreach($loan_ids as $id) {
+
+            $principle = DB::table('loans')->where('id', $id)->value('principle');
+
+            $charge_ids = DB::table('loan_has_charges')->where('loan_id', $id)->pluck('charge_id')->toArray();
+
+            $charges = DB::table('charges')->whereIn('id', $charge_ids)->get();
+
+            $loan_amount = 0; // Initialize loan amount for each loan
+
+            foreach($charges as $charge) {
+
+                if ($charge->percentage_charge_amount === null) {
+                    // Use flat charge if percentage is null
+                    $loan_amount += $charge->flat_charge_amount;
+                } else {
+                    // Calculate percentage charge based on principle
+                    $loan_amount += ($charge->percentage_charge_amount * $principle) / 100;
+                }
+            }
+
+            // Add the loan's calculated charges to the total amount
+            $total_amount += $loan_amount;
+        }
+
+        return $total_amount;
     }
 }

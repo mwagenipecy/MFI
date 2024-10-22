@@ -9,6 +9,15 @@
 
             <div class="flex justify-center px-4 pt-4 pb-4" >
 
+                @if (session()->has('message_fail'))
+
+                <div id="flash-message" class="fixed top-0 right-0 m-4 bg-red-600 text-white p-4 rounded shadow-md transition duration-300 transform -translate-y-full" role="alert">
+                    <strong>Error!</strong> {{ session('message_fail') }}
+
+                </div>
+
+                @endif
+
 
                 <div class=" flex flex-row gap-2">
 
