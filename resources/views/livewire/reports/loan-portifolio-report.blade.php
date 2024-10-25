@@ -1,8 +1,4 @@
 <div>
-
-
-
-
   <!-- Report Header -->
   <div class="mb-8 flex justify-between bg-red-50  ">
     <div class="p-4">
@@ -60,10 +56,8 @@
     </table>
   </div>
 
-
   <!-- Loan Distribution by Loan Type -->
   <hr class="border-2 border-red-500 mx-2 ">
-
   <div class="bg-white  rounded-lg p-2 mb-8">
     <h4 class="text-lg font-semibold uppercase mb-4">2. Loan Distribution by Loan Type</h4>
     <table class="min-w-full table-auto">
@@ -77,17 +71,13 @@
       </thead>
       <tbody class="divide-y divide-gray-200">
         @foreach ($loan_product as $data)
-
-
         <tr>
           <td class="px-4 py-2 border text-gray-800"> {{ $data->sub_product_name }}</td>
           <td class="px-4 py-2  border text-gray-800"> {{ $data->loan_no }} </td>
           <td class="px-4 py-2border  text-gray-800"> {{ number_format($data->amount_disbursed ,2) }} TZS </td>
           <td class="px-4 py-2 border text-gray-800"> {{ number_format( $data->out_standing_amount,2) }}  TZS</td>
         </tr>
-
         @endforeach
-
       </tbody>
       <thead class="bg-red-50">
         <tr>
@@ -97,7 +87,6 @@
           <th class="px-4 border py-2 text-left text-gray-600 font-medium"> {{ number_format($amount2,2) }} TZS </th>
         </tr>
       </thead>
-
     </table>
   </div>
 

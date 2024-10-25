@@ -4,21 +4,24 @@ namespace App\Http\Livewire\Reports;
 
 use Livewire\Component;
 
+class LoanApplications extends Component
 
-class Portifolio extends Component
 {
+
     public $status,$branch,$endDate,$startDate,$aging;
+
 
     public function render()
     {
-        return view('livewire.reports.portifolio');
+        return view('livewire.reports.loan-applications');
     }
+
 
     function resetAll(){
         $this->emit('changeBranch',null);
         $this->emit('changeEndDate',null);
         $this->emit('changeStartDate',null);
-        $this->emit('changeAging',null);
+      //  $this->emit('changeAging',null);
         $this->emit('changeStatus',null);
 
     }
@@ -37,17 +40,14 @@ class Portifolio extends Component
     }
 
 
-    function updatedAging($aging){
-        $this->emit('changeAging',$aging);
-    }
+    // function updatedAging($aging){
+    //     $this->emit('changeAging',$aging);
+    // }
 
 
     function updatedStatus($status){
         $this->emit('changeStatus',$status);
     }
-
-
-
 
 
 }

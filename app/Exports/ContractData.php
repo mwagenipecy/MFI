@@ -64,11 +64,11 @@ class ContractData implements FromArray,WithHeadings, WithStyles, ShouldAutoSize
                 'InterestRate'=>$loanData->interest,
                 'TotalAmount'=>number_format($loanData->principle,2),
                 'TotalTakenAmount'=>number_format(((double)$loanData->principle -(double)$loanData->total_principle-(double)$loanData->future_interest),2),
-                'InstallmentAmount'=>number_format(loans_schedules::where('loan_id',$loanData->loan_id)->sum('installment'),2 ),
+                'InstallmentAmount'=>number_format(loans_schedules::where('loan_id',$loanData->loan_id)->max('id')->value('installment'),2 ),
                 'NumberofInstallments'=>loans_schedules::where('loan_id',$loanData->loan_id)->count(),
                 'NumberofOutstandingInstallments'=>(loans_schedules::where('loan_id',$loanData->loan_id)->count()) - (loans_schedules::where('loan_id',$loanData->loan_id) ->where('completion_status','CLOSED')->count()),
-                'OutstandingAmount'=>number_format(loans_schedules::where('loan_id',$loanData->loan_id)
-                ->where('completion_status','CLOSED')->sum('installment'),2),
+                'OutstandingAmount'=>number_format((loans_schedules::where('loan_id',$loanData->loan_id)->sum('installement')- loans_schedules::where('loan_id',$loanData->loan_id)
+                ->where('completion_status','CLOSED')->sum('installment')),2),
                 'Past Due Amount'=>null,
                 'PastDueDays'=>$loanData->days_in_arrears,
                 'NumberOfDueInstallments'=>null,
@@ -80,7 +80,7 @@ class ContractData implements FromArray,WithHeadings, WithStyles, ShouldAutoSize
                 'TotalMonthlyPayment'=>number_format( (loans_schedules::where('loan_id', $loanData->loan_id)
                 ->where('completion_status', 'CLOSED')
                 ->whereBetween('updated_at', [$startDate, $endDate])->sum('payment')),2),
-                'PaymentPeriodicity'=>null,
+                'PaymentPeriodicity'=>'Monthly',
                 'CreditUsageinLast30Days'=>null,
                 'StartDate'=>loans_schedules::where('loan_id',$loanData->loan_id)->min('installment_date'),
                 'ExpectedEndDate'=>loans_schedules::where('loan_id',$loanData->loan_id)->max('installment_date'),

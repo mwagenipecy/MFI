@@ -99,7 +99,7 @@
 
             <div class="grid grid-cols-4 gap-2 p-2">
                 @php
-                
+
                     $menuItems = [
                         ['id' => 1, 'label' => 'Daily  Report'],
                         ['id' => 2, 'label' => 'Clients Details Report'],
@@ -402,7 +402,9 @@
                     @break
 
                         @case('6')
-                        <livewire:reports.loan-application-report />
+
+
+                        <livewire:reports.loan-applications />
 
 
                     @break

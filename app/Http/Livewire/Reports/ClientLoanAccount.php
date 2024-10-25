@@ -33,6 +33,12 @@ class ClientLoanAccount extends LivewireDatatable
     function changeEndDate($date){
         $this->end_date=$date;
     }
+
+    function changeAging($aging){
+        $this->aging=$aging;
+    }
+
+
     function changeStartDate($date){
     $this->start_date=$date;
     }
@@ -47,7 +53,7 @@ class ClientLoanAccount extends LivewireDatatable
 
   public function builder(){
 
-     $query=LoansModel::query();
+     $query=LoansModel::query()->where('status','ACTIVE');
      //->where('status','ACTIVE');
 
     if(!empty($this->start_date)){
@@ -66,16 +72,16 @@ class ClientLoanAccount extends LivewireDatatable
      }
 
      if(!empty($this->status)){
-        $query= $query->where('status',$this->status);
+        $query= $query->where('loan_status',$this->status);
      }
 
 
      if(!empty($this->aging)){
-        $query= $query->where('status',$this->aging);
+        $query= $query->where('principle','<=',$this->aging);
      }
 
-     session()->put('summAmount',$query->sum('principle') );
-     session()->put('interest',$query->sum('interest') );
+    // session()->put('summAmount',$query->sum('principle') );
+     //session()->put('interest',$query->sum('interest') );
 
    return  $query;
 }
@@ -115,7 +121,7 @@ public function columns()
         })->label('branch'),
         column::callback('principle',function($principle){
             return number_format($principle);
-        })->label('principle')->searchable(),
+        })->label('principle'),
 
         Column::callback(['interest','principle'],function($interest,$principle){
             return number_format($interest*$principle/100 ,2);
@@ -128,7 +134,7 @@ public function columns()
         column::callback('interest',function ($interest){
             return $interest.'%';
         })->label('interest')->searchable(),
-        column::name('tenure')->label('tenure (Month (s) )') ->enableSummary(),
+        column::name('tenure')->label('tenure (Month (s) )') ,
         column::name('status')->label('status')
 
 
